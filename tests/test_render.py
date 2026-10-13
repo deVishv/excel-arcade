@@ -92,3 +92,28 @@ def test_stage_sheet(tmp_path):
     sqrefs = " ".join(str(dv.sqref) for dv in s.data_validations.dataValidation)
     assert f"C{rows['C1']}" in sqrefs and f"E{rows['C1']}" in sqrefs
     assert len(s.conditional_formatting) >= 1
+
+
+from excel_drills.hub_sheet import render_cheat_codes, render_hub
+from excel_drills.stage_sheet import PlacedSheet
+
+
+def test_hub_and_cheat_codes(tmp_path):
+    book = Book(tmp_path / "h.xlsx", title="t", subject="s", keywords="k")
+    hub = book.sheet("Start")
+    codes = book.sheet("Cheat Codes")
+    stage = PlacedSheet("S9-1", "Demo", "S9-1 Demo", None, 12, 20, 80, [])
+    boss = PlacedSheet("BOSS", "Boss", "Boss", "Boss Arena", 14, 30, 120, [], gate="Boss!$C$10",
+                       time_cell="Boss!$C$8", par=10)
+    refs = render_hub(book, hub, title="SHORTCUTS 9 ▸ DEMO", tagline="Practice.", sheets=[stage], boss=boss)
+    item = Item("S9.a", "shortcut", "Ctrl+A", "Select the data block.", "Press twice.", "q?", ("Ctrl+A",), "h")
+    render_cheat_codes(book, codes, title="CHEAT CODES ▸ DEMO",
+                       stages=(Stage("S9-1", "Demo", "g", (item,), (), None),))
+    book.close()
+    wb = openpyxl.load_workbook(tmp_path / "h.xlsx")
+    h, c = wb["Start"], wb["Cheat Codes"]
+    assert h["A1"].value == "SHORTCUTS 9 ▸ DEMO" and h.protection.sheet and not h.sheet_view.showGridLines
+    assert {"total", "rank", "next", "status:S9-1", "status:BOSS"} <= refs.keys()
+    links = [cell.hyperlink.location for row in h.iter_rows() for cell in row if cell.hyperlink]
+    assert "'S9-1 Demo'!A1" in links and "Boss!A1" in links
+    assert c["B5"].value == "Ctrl+A" and c.protection.sheet
