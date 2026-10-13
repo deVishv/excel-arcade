@@ -65,7 +65,11 @@ class Course:
         if len(options) < 3:
             raise ValueError(f"{item_id}: needs 3 PICK distractors, found {options}")
         choices = tuple(sorted([item.display, *options], key=lambda d: _h(item.id + d)))
-        return Challenge(cid, "PICK", item.prompt, item.hint, Pick(choices, item.display),
+        if normalize(item.display) in mine:              # the option itself answers the recall question
+            prompt = "Pick " + item.prompt[5:] if item.prompt.startswith("Type ") else item.prompt
+        else:                                            # e.g. "( ) first" can't answer "What does =2+3*4 return?"
+            prompt = f"Which move is this? {item.what}"
+        return Challenge(cid, "PICK", prompt, item.hint, Pick(choices, item.display),
                          solve=(Fixture("type", "«ans»", item.display),),
                          wrong=((Fixture("type", "«ans»", options[0]),),), items=(item_id,))
 

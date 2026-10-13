@@ -13,6 +13,7 @@ from typing import Iterable
 
 from . import theme as T
 from .normalize import excel_normalize
+from .writer import BUILD_DATE
 
 ERROR_NAMES = ("#NULL!", "#DIV/0!", "#VALUE!", "#REF!", "#NAME?", "#NUM!", "#N/A", "#GETTING_DATA",
                "#SPILL!", "#CONNECT!", "#BLOCKED!", "#UNKNOWN!", "#FIELD!", "#CALC!")
@@ -275,7 +276,7 @@ class SelfCheck(Check):
         return (T.DONE,)
 
     def formula(self):
-        return CheckFormula(f'=IF(«ans»={q(T.DONE)},{q(T.OK_SELF)},"")', "")
+        return CheckFormula(_guard(f'IF(«ans»={q(T.DONE)},{q(T.OK_SELF)},"")'), "")
 
 
 # ---- condition helpers (Excel boolean expressions) -------------------------------------------------
@@ -308,8 +309,14 @@ def line_break(addr: str, first: str, second: str) -> str:
 
 
 def today_constant(addr: str) -> str:
+    """A whole-day date constant (what Ctrl+; types) from the build date up to today.
+
+    Comparing with TODAY() alone would take the ✔ away the next day; the lower bound keeps
+    small numbers such as 5 from passing as dates.
+    """
     c = at(addr)
-    return f"AND(ISNUMBER({c}),NOT(ISFORMULA({c})),INT({c})=TODAY())"
+    built = f"DATE({BUILD_DATE.year},{BUILD_DATE.month},{BUILD_DATE.day})"
+    return f"AND(ISNUMBER({c}),NOT(ISFORMULA({c})),{c}=INT({c}),{c}>={built},{c}<=TODAY())"
 
 
 def time_constant(addr: str) -> str:
@@ -328,7 +335,8 @@ def prefix_is(addrs: Iterable[str], prefix: str = "^") -> str:
 
 
 def column_hidden(addr: str) -> str:
-    return f'CELL("width",{at(addr)})=0'
+    # CELL("width") returns two items (width, is-default) in Excel 365; take the width so the check can't spill
+    return f'INDEX(CELL("width",{at(addr)}),1)=0'
 
 
 def visible_label_count(rng: str, label: str) -> str:

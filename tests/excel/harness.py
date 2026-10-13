@@ -84,3 +84,10 @@ def read(wb, ref: str):
 
 def read_cell(wb, sheet: str, cell: str):
     return wb.Worksheets(sheet).Range(cell).Value2
+
+
+def unexpected_spills(wb, formulas) -> list[str]:
+    """Formulas outside arenas and the Key must return one value: a spill would cover the cells beside them
+    (found in review: CELL("width") returns two items, so a check spilled into its Hint? picker)."""
+    return [f"{f.sheet}!{f.cell}" for f in formulas
+            if f.sheet != "Key" and not f.sheet.endswith("Arena") and wb.Worksheets(f.sheet).Range(f.cell).HasSpill]

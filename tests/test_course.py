@@ -36,6 +36,16 @@ def test_pick_has_exactly_one_correct_option(course):
                     assert not (set(course.accepted(other.id)) & set(course.accepted(item_id)))
 
 
+def test_pick_correct_option_answers_the_question(course):
+    """The highlighted option must answer the question shown (found in review: 'What does =2+3*4 return?' had
+    '( ) first' as its only right option). Otherwise the question is the move's own description."""
+    for item_id, item in course.items.items():
+        ch = course.pick(item_id, "X.T1")
+        assert not ch.prompt.startswith("Type "), f"{item_id}: a dropdown question can't ask to type"
+        if normalize(item.display) not in course.accepted(item_id):
+            assert ch.prompt == f"Which move is this? {item.what}", item_id
+
+
 def test_pick_is_deterministic(course):
     for item_id in course.items:
         assert course.pick(item_id, "a").check.choices == course.pick(item_id, "a").check.choices

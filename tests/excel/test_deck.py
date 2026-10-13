@@ -4,7 +4,7 @@ import pytest
 from excel_drills.content import FINAL, WORLDS
 from excel_drills.course import Course
 from excel_drills.deck_builder import build_deck
-from tests.excel.harness import is_error, read, read_cell, same
+from tests.excel.harness import is_error, read, read_cell, same, unexpected_spills
 
 pytestmark = pytest.mark.excel
 
@@ -23,6 +23,8 @@ def test_deck_opens_clean(deck, excel):
             assert not is_error(got), f"{f.sheet}!{f.cell}"
             if not f.volatile:
                 assert same(got, f.cached), f"{f.sheet}!{f.cell}: cached {f.cached!r}, Excel {got!r}"
+        spills = unexpected_spills(wb, built.formulas)
+        assert not spills, spills[:20]
 
 
 def test_deck_schedules_cards(deck, excel):

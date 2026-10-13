@@ -93,3 +93,8 @@ def test_self_check():
     s = C.SelfCheck()
     assert s.options() == (T.DONE,)
     assert T.OK_SELF in s.formula().template
+
+
+def test_self_check_result_is_error_guarded():
+    # Global Constraint: no learner-facing result may show an Excel error (a pasted #N/A would break the score)
+    assert C.SelfCheck().formula().template.startswith("=IFERROR(")

@@ -7,7 +7,7 @@ from excel_drills.course import Course
 from excel_drills.final_builder import TIMER, build_final
 from excel_drills.refs import split_ref
 from tests.excel.actions import apply, truth
-from tests.excel.harness import is_error, read, read_cell, same
+from tests.excel.harness import is_error, read, read_cell, same, unexpected_spills
 from tests.excel.test_worlds import _exercise, _ok
 
 pytestmark = pytest.mark.excel
@@ -26,6 +26,8 @@ def test_final_no_errors_and_honest_cache(final_book, excel):
                 assert not is_error(got), f"{f.sheet}!{f.cell}"
             if not (f.error_ok or f.volatile):
                 assert same(got, f.cached), f"{f.sheet}!{f.cell}: cached {f.cached!r}, Excel {got!r}"
+        spills = unexpected_spills(wb, final_book.formulas)
+        assert not spills, spills[:20]
 
 
 def test_final_every_mission(final_book, excel):

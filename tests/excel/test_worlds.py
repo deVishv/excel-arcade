@@ -7,11 +7,11 @@ from excel_drills.checks import Find, find_key
 from excel_drills.content import FINAL, WORLDS
 from excel_drills.course import Course
 from excel_drills.model import Fixture
-from excel_drills.refs import split_ref
+from excel_drills.refs import resolve, split_ref
 from excel_drills.world_builder import build_world
 from tests.demo_content import DEMO
-from tests.excel.actions import LIGHT, apply, restore, snapshot, truth
-from tests.excel.harness import is_error, read, read_cell, same
+from tests.excel.actions import LIGHT, apply, restore, rng, snapshot, truth
+from tests.excel.harness import is_error, read, read_cell, same, unexpected_spills
 
 pytestmark = pytest.mark.excel
 CODES = ["D1", *[w.code for w in WORLDS]]
@@ -92,6 +92,14 @@ def test_no_error_values(code, built, excel):
 
 
 @pytest.mark.parametrize("code", CODES)
+def test_no_unexpected_spills(code, built, excel):
+    b = built(code)
+    with excel.open(b.path) as wb:
+        spills = unexpected_spills(wb, b.formulas)
+    assert not spills, spills[:20]
+
+
+@pytest.mark.parametrize("code", CODES)
 def test_cached_values_match(code, built, excel):
     b = built(code)
     bad = []
@@ -158,6 +166,8 @@ def test_full_playthrough(code, built, excel):
         not_ok = [(pc.sheet, pc.label, read(wb, pc.result)) for s in b.sheets for pc in s.challenges
                   if not _ok(read(wb, pc.result))]
         assert not not_ok, not_ok
+        spills = unexpected_spills(wb, b.formulas)
+        assert not spills, spills[:20]
         for s in stages:
             assert read(wb, b.hub[f"status:{s.code}"]) == "PERFECT"
         assert read(wb, b.hub["status:BOSS"]) == "DEFEATED"
@@ -168,6 +178,22 @@ def test_full_playthrough(code, built, excel):
         bws.Range("C7").Value2 = 0.5 + (boss.par - 1) / 1440
         excel.calc()
         assert read(wb, b.hub["rank"]) == "S"
+
+
+def test_date_stamp_stays_clear_the_next_day(built, excel):
+    """A Ctrl+; date is a constant, so its ✔ must survive midnight (found in review)."""
+    b = built("D1")
+    pc = next(pc for s in b.sheets for pc in s.challenges if pc.challenge.id == "D1-1.M12")
+    with excel.open(b.path) as wb:
+        today = wb.Application.Evaluate("TODAY()")
+        cell = rng(wb, resolve(pc.challenge.solve[0].target, pc.names, pc.arena_sheet))
+        for value, want in ((today - 1, True), (today + 1, False), ("=TODAY()-1", False)):
+            if isinstance(value, str):
+                cell.Formula2 = value
+            else:
+                cell.Value2 = value
+            excel.calc()
+            assert _ok(read(wb, pc.result)) == want, value
 
 
 def test_hint_costs_half_xp(built, excel):
