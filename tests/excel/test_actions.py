@@ -6,6 +6,7 @@ import xlsxwriter
 
 from excel_drills.model import Fixture
 from tests.excel.actions import apply, truth
+from tests.excel.harness import is_error
 
 pytestmark = pytest.mark.excel
 ROWS = [("Player", "Score"), ("Ida", 95), ("Bo", 90), ("Zircon", 25), ("Ann", 40)]
@@ -65,3 +66,11 @@ def test_address_recipes(excel, book):
     with excel.open(book) as wb:
         assert truth(wb, ("nonformula_in", "D1:D2"), arena_sheet="A", stage_sheet="A") == "D2"
         assert truth(wb, ("formula_ref_outside", "D1", "B2:B5"), arena_sheet="A", stage_sheet="A") == "F9"
+
+
+def test_paste_error_puts_an_error_value_in_a_text_cell(excel, book):
+    with excel.open(book) as wb:
+        ws = wb.Worksheets("A")
+        ws.Range("G1").NumberFormat = "@"
+        apply(wb, Fixture("paste_error", "«@G1»", "=NA()"), {}, "A")
+        assert is_error(ws.Range("G1").Value2) and not ws.Range("G1").HasFormula

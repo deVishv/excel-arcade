@@ -263,20 +263,22 @@ def test_odd_inputs_never_error(code, built, excel):
                 if kind in ("RECALL", "PICK", "FIND", "SELF"):
                     target = pc.names["ans"]
                     attempts = [Fixture("type", target, v) for v in ODD_ANSWERS]
-                    attempts += [Fixture("formula", target, "=1/0"), Fixture("formula", target, "=NA()")]
+                    errors = [Fixture("paste_error", target, "=1/0"), Fixture("paste_error", target, "=NA()")]
                 elif kind == "FORMULA":
                     target = f"«@{pc.challenge.arena_cell}»"
-                    attempts = [Fixture("formula", target, "=1/0"), Fixture("type", target, "abc"),
-                                Fixture("type", target, 12345)]
+                    attempts = [Fixture("type", target, "abc"), Fixture("type", target, 12345)]
+                    errors = [Fixture("formula", target, "=1/0")]
                 else:
                     continue
-                for fx in attempts:
+                for fx in attempts + errors:
                     saved = snapshot(wb, [fx], pc.names, pc.arena_sheet)
                     try:
                         apply(wb, fx, pc.names, pc.arena_sheet)
                     except Exception:
                         continue                    # Excel refused the entry outright
                     excel.calc()
+                    if fx in errors and not is_error(rng(wb, resolve(fx.target, pc.names, pc.arena_sheet)).Value2):
+                        bad.append(f"{pc.sheet} {pc.label}: {fx.value!r} left no error in the cell (guard untested)")
                     got = read(wb, pc.result)
                     restore(saved)
                     excel.calc()

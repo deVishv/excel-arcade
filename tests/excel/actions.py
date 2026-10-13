@@ -107,6 +107,13 @@ def apply(wb, fx, names: dict, arena_sheet: str | None) -> None:
         rng(wb, target).FlashFill()          # the range must include the typed example cell (verified in Excel)
     elif a == "pick_hint":
         rng(wb, names["picker"]).Value2 = "Show hint"
+    elif a == "paste_error":             # an error VALUE, as pasted from elsewhere: typing "=1/0" into a
+        scratch = wb.Worksheets(wb.Worksheets.Count).Range("XFD1")   # Text-formatted cell only stores text
+        scratch.Formula2 = fx.value
+        scratch.Copy()
+        rng(wb, target).PasteSpecial(XL_VALUES)
+        wb.Application.CutCopyMode = False
+        scratch.ClearContents()
     else:
         raise ValueError(f"unknown fixture action {a!r}")
 
