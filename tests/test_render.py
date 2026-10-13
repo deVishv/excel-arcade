@@ -53,3 +53,42 @@ def test_arena_render(tmp_path):
     assert a["F6"].fill.fgColor.rgb.endswith("FFF4CC")
     assert "TREASURE" in wb.defined_names
     assert wb["Rename Me"]["A1"].value == "RENAME ME"
+
+
+from excel_drills import theme as T
+from excel_drills.checks import Recall as _Recall
+from excel_drills.model import Challenge, Fixture, Item, Stage, find, formula, self_check
+from excel_drills.stage_sheet import ChallengeTable, render_stage
+
+
+def test_stage_sheet(tmp_path):
+    book = Book(tmp_path / "s.xlsx", title="t", subject="s", keywords="k")
+    ws = book.sheet("S9-1 Demo")
+    aws = book.sheet("S9-1 Arena")
+    key = KeySheet(book, book.sheet("Key"))
+    render_arena(book, aws, Arena(cells={"C6": 2, "D6": 5}, pass_code="P"), title="ARENA", back_sheet=ws.name)
+    item = Item("S9.a", "shortcut", "Ctrl+A", "Select the data block.", "Press twice for more.",
+                "Which keys select the data block?", ("Ctrl+A",), "Think A for All.")
+    recall = Challenge("S9-1.R1", "RECALL", item.prompt, item.hint, _Recall(("CTRL+A",)),
+                       (Fixture("type", "«ans»", "Ctrl+A"),), ((Fixture("type", "«ans»", "Ctrl+Q"),),), ("S9.a",))
+    missions = (
+        find("S9-1.M1", "Type the word.", "Look down.", "COMET", items=("S9.a",), wrong=("STAR",)),
+        formula("S9-1.M2", "Multiply C6 by D6 in F6.", "Use *.", "F6", "=C6*D6", 10, items=("S9.a",), wrong=("=C6+D6",)),
+        self_check("S9-1.M3", "Bold B6, then pick Done.", "Ctrl+B.", items=("S9.a",)),
+    )
+    stage = Stage("S9-1", "Demo", "test the table", (item,), missions, None)
+    placed = render_stage(book, ws, key, stage, warmups=[], training=[], recalls=[recall], arena_sheet=aws.name,
+                          next_label="S9-2 Next", extra_names={})
+    book.close()
+    assert placed.max_xp == 40 and len(placed.challenges) == 4
+    s = openpyxl.load_workbook(tmp_path / "s.xlsx")["S9-1 Demo"]
+    assert s.freeze_panes == "A5" and s.protection.sheet
+    assert s["A1"].value == "STAGE S9-1 ▸ DEMO" and s["A2"].value == "Goal: test the table"
+    rows = {pc.label: pc.row for pc in placed.challenges}
+    fm = rows["C3"]
+    assert s[f"C{fm}"].hyperlink.location == "'S9-1 Arena'!F6"
+    assert _text(s[f"D{fm}"]).startswith("=") and s.row_dimensions[fm].height > 15
+    assert s[f"C{rows['C1']}"].number_format == "@"
+    sqrefs = " ".join(str(dv.sqref) for dv in s.data_validations.dataValidation)
+    assert f"C{rows['C1']}" in sqrefs and f"E{rows['C1']}" in sqrefs
+    assert len(s.conditional_formatting) >= 1
