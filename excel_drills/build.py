@@ -10,6 +10,7 @@ from .world_builder import build_world
 
 def build_all(out_dir: Path, *, only: str | None = None) -> list[Path]:
     from .content import FINAL, WORLDS
+    from .deck_builder import build_deck
     from .final_builder import build_final
 
     course = Course(WORLDS, FINAL)
@@ -18,7 +19,10 @@ def build_all(out_dir: Path, *, only: str | None = None) -> list[Path]:
         if problems:
             raise SystemExit("Content problems:\n  " + "\n  ".join(problems))
     out_dir.mkdir(parents=True, exist_ok=True)
-    paths = [build_world(course, w, out_dir).path for w in course.worlds if only in (None, w.code)]
+    paths = []
+    if only in (None, "DECK"):
+        paths.append(build_deck(course, out_dir).path)
+    paths += [build_world(course, w, out_dir).path for w in course.worlds if only in (None, w.code)]
     if FINAL is not None and only in (None, "FINAL"):
         paths.append(build_final(course, out_dir).path)
     return paths
@@ -27,7 +31,7 @@ def build_all(out_dir: Path, *, only: str | None = None) -> list[Path]:
 def main(argv=None) -> None:
     parser = argparse.ArgumentParser(description="Build the Excel Arcade workbooks.")
     parser.add_argument("--out", default="workbooks", help="output folder (default: workbooks)")
-    parser.add_argument("--only", help="build one workbook (world code such as S1) without full-course validation")
+    parser.add_argument("--only", help="build one workbook (S1 … F7, FINAL or DECK) without full-course validation")
     args = parser.parse_args(argv)
     for path in build_all(Path(args.out), only=args.only):
         print(f"built {path}")
