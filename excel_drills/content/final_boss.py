@@ -95,7 +95,7 @@ R2_MISSIONS = (
     formula("R2.M4", "In O9 average the East Revenue and round it to a whole number, in one formula.",
             "ROUND(AVERAGEIFS(…),0).", "O9", '=ROUND(AVERAGEIFS(H6:H25,D6:D25,"East"),0)',
             xl_round(mean(o.revenue for o in ORDERS if o.region == "East"), 0), items=("F1.round", "F3.averageifs"),
-            wrong=('=AVERAGEIFS(H6:H25,D6:D25,"East")',), uses=("ROUND", "AVERAGEIFS")),
+            wrong=('=AVERAGEIFS(H6:H25,D6:D25,"East")',), uses=("ROUND", ("AVERAGEIF", "AVERAGEIFS"))),
     formula("R2.M5", "In O10 count the different Products with COUNTA and UNIQUE.", "COUNTA(UNIQUE(…)).", "O10",
             "=COUNTA(UNIQUE(F6:F25))", len({o.product for o in ORDERS}), items=("F7.unique",),
             wrong=("=COUNTA(F6:F25)",), uses=("COUNTA", "UNIQUE")),
@@ -105,7 +105,7 @@ R2_MISSIONS = (
     filled("R2.M7", 'In I6 return "Star" when Units ≥ 50 AND Revenue ≥ 2500, otherwise "-". Fill down to I25.',
            "IF(AND(…)).", "I6:I25", lambda c: f'=IF(AND(G{_r(c)}>=50,H{_r(c)}>=2500),"Star","-")',
            ["Star" if o.units >= 50 and o.revenue >= 2500 else "-" for o in ORDERS], items=("F2.if", "F2.and"),
-           wrong_for=lambda c: f'=IF(OR(G{_r(c)}>=50,H{_r(c)}>=2500),"Star","-")', uses=("IF", "AND")),
+           wrong_for=lambda c: f'=IF(OR(G{_r(c)}>=50,H{_r(c)}>=2500),"Star","-")', uses=(("IF", "IFS"), "AND")),
     spill("R2.M8", "In Q6 spill the Order IDs of Raj's orders with FILTER.", 'FILTER(B6:B25,E6:E25="Raj").', "Q6",
           '=FILTER(B6:B25,E6:E25="Raj")', [[o.id] for o in ORDERS if o.rep == "Raj"], items=("F7.filter",),
           wrong=('=FILTER(B6:B25,E6:E25="Kim")',), uses=("FILTER",)),
@@ -172,12 +172,12 @@ R3_MISSIONS = (
         "R3.M5", 'In H6 flag big orders: "Big" when the Amount (F6) is at least 1000, otherwise empty text. Fill down '
                  "to H17.", 'IF(F6>=1000,"Big","").', "H6:H17", lambda c: f'=IF(F{_r(c)}>=1000,"Big","")',
         ["Big" if amount(a) >= 1000 else "" for _, _, a in RAW], items=("F2.if", "F2.empty_text"),
-        wrong_for=lambda c: f'=IF(F{_r(c)}>1000,"Big","No")', uses=("IF",),
+        wrong_for=lambda c: f'=IF(F{_r(c)}>1000,"Big","No")', uses=(("IF", "IFS"),),
         key_for=lambda c: f'=IF(VALUE(D{_r(c)})>=1000,"Big","")')),
     after(R3_M3.solve, spill(
         "R3.M6", "In Q6 spill each Region once, sorted A→Z, from your Region column (G6:G17).", "SORT(UNIQUE(…)).",
         "Q6", "=SORT(UNIQUE(G6:G17))", [[r] for r in sorted({CODE_NAME[c] for _, c, _ in RAW})],
-        items=("F7.nesting",), wrong=("=UNIQUE(G6:G17)",), uses=("SORT", "UNIQUE"),
+        items=("F7.nesting",), wrong=("=UNIQUE(G6:G17)",), uses=(("SORT", "SORTBY"), "UNIQUE"),
         key="=SORT(UNIQUE(XLOOKUP(C6:C17,K6:K9,L6:L9)))")),
     after(R3_M2.solve, do(
         "R3.M7", "Dress the Amount column F6:F17 as currency with Ctrl+Shift+$. Press F9.", "Ctrl+Shift+4.",

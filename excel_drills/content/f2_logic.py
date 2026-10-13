@@ -73,7 +73,7 @@ MISSIONS_2 = (
            wrong_for=lambda c: f"=IF(C{_r(c)}>=80,10,0)", uses=("IF",)),
     formula("F2-2.M3", 'J6 is empty. In I6 write a formula that shows empty text ("") when J6 is empty, otherwise '
                        "J6*2.", '=IF(J6="","",J6*2)', "I6", '=IF(J6="","",J6*2)', "", items=("F2.empty_text",),
-            wrong=("=J6*2",), uses=("IF",)),
+            wrong=("=J6*2",), uses=(("IF", "IFS"),)),
 )
 STAGE_2 = Stage("F2-2", "Fork in the Road", "return different results with IF", ITEMS_2, MISSIONS_2, ARENA_2)
 
@@ -205,7 +205,7 @@ BOSS_ARENA = Arena(
 BOSS_MISSIONS = (
     filled("F2-B.M1", 'In F6 return "Pass" for a Score of 60 or more, otherwise "Fail". Fill down to F15.', "IF.",
            "F6:F15", lambda c: f'=IF(C{_r(c)}>=60,"Pass","Fail")', ["Pass" if p[1] >= 60 else "Fail" for p in PEOPLE],
-           items=("F2.if",), wrong_for=lambda c: f'=IF(C{_r(c)}>60,"Pass","Fail")', uses=("IF",)),
+           items=("F2.if",), wrong_for=lambda c: f'=IF(C{_r(c)}>60,"Pass","Fail")', uses=(("IF", "IFS"),)),
     filled("F2-B.M2", 'In G6 return "Yes" when Age is 18+ AND Score is 70+, otherwise "No". Fill down to G15.', "AND.",
            "G6:G15", lambda c: f'=IF(AND(D{_r(c)}>=18,C{_r(c)}>=70),"Yes","No")',
            ["Yes" if p[2] >= 18 and p[1] >= 70 else "No" for p in PEOPLE], items=("F2.and",),
@@ -225,7 +225,7 @@ BOSS_MISSIONS = (
            lambda c: f'=IF(AND(C{_r(c)}>=80,D{_r(c)}>=18),"VIP",IF(C{_r(c)}>=60,"Member","Guest"))',
            ["VIP" if p[1] >= 80 and p[2] >= 18 else "Member" if p[1] >= 60 else "Guest" for p in PEOPLE],
            items=("F2.nested_if", "F2.and"),
-           wrong_for=lambda c: f'=IF(C{_r(c)}>=80,"VIP",IF(C{_r(c)}>=60,"Member","Guest"))', uses=("IF", "AND")),
+           wrong_for=lambda c: f'=IF(C{_r(c)}>=80,"VIP",IF(C{_r(c)}>=60,"Member","Guest"))', uses=(("IF", "IFS"), "AND")),
     formula("F2-B.M6", 'In L6 return TRUE when Ava (row 6) is NOT licensed (E6 is not "Yes"). Use NOT.', "NOT(…)",
             "L6", '=NOT(E6="Yes")', True, items=("F2.not",), wrong=('=E6="Yes"',), uses=("NOT",)),
     filled("F2-B.M7", "In E21 divide Total by Units with an IFERROR shield (0 on errors). Fill down to E26.",

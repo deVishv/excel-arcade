@@ -42,13 +42,13 @@ MISSIONS_1 = (
             wrong=('=COUNTIF(D6:D25,"West")',), uses=("COUNTIF",)),
     formula("F3-1.M2", "In M7 count the orders with more than 50 units (G6:G25).", 'Criteria ">50" in quotes.', "M7",
             '=COUNTIF(G6:G25,">50")', sum(o.units > 50 for o in ORDERS), items=("F3.criteria_ops",),
-            wrong=('=COUNTIF(G6:G25,">=50")',), uses=("COUNTIF",)),
+            wrong=('=COUNTIF(G6:G25,">=50")',), uses=(("COUNTIF", "COUNTIFS"),)),
     formula("F3-1.M3", "In M8 count the products (F6:F25) whose name starts with G.", 'Use "G*".', "M8",
             '=COUNTIF(F6:F25,"G*")', sum(o.product.startswith("G") for o in ORDERS), items=("F3.wildcards",),
-            wrong=('=COUNTIF(F6:F25,"G")',), uses=("COUNTIF",), contains=("*",)),
+            wrong=('=COUNTIF(F6:F25,"G")',), uses=(("COUNTIF", "COUNTIFS"),), contains=("*",)),
     formula("F3-1.M4", "In M9 count the orders NOT from East.", 'Criteria "<>East".', "M9",
             '=COUNTIF(D6:D25,"<>East")', sum(not east(o) for o in ORDERS), items=("F3.criteria_ops",),
-            wrong=('=COUNTIF(D6:D25,"East")',), uses=("COUNTIF",), contains=("<>",)),
+            wrong=('=COUNTIF(D6:D25,"East")',), uses=(("COUNTIF", "COUNTIFS"),), contains=("<>",)),
 )
 STAGE_1 = Stage("F3-1", "Counters", "count only the rows you care about", ITEMS_1, MISSIONS_1, ARENA_1)
 
@@ -70,10 +70,10 @@ MISSIONS_2 = (
             wrong=('=SUMIF(D6:D25,"West",G6:G25)',), uses=("SUMIF",)),
     formula("F3-2.M2", "In M7 average the Units (G) of Kim's orders (Rep in column E).", "AVERAGEIF.", "M7",
             '=AVERAGEIF(E6:E25,"Kim",G6:G25)', mean(o.units for o in ORDERS if o.rep == "Kim"),
-            items=("F3.averageif",), wrong=('=AVERAGEIF(E6:E25,"Lee",G6:G25)',), uses=("AVERAGEIF",)),
+            items=("F3.averageif",), wrong=('=AVERAGEIF(E6:E25,"Lee",G6:G25)',), uses=(("AVERAGEIF", "AVERAGEIFS"),)),
     formula("F3-2.M3", "In M8 add up the Revenue of orders with 40 or more Units.", 'Criteria ">=40".', "M8",
             '=SUMIF(G6:G25,">=40",H6:H25)', sum(o.revenue for o in ORDERS if o.units >= 40),
-            items=("F3.sumif", "F3.criteria_ops"), wrong=('=SUMIF(G6:G25,">40",H6:H25)',), uses=("SUMIF",)),
+            items=("F3.sumif", "F3.criteria_ops"), wrong=('=SUMIF(G6:G25,">40",H6:H25)',), uses=(("SUMIF", "SUMIFS"),)),
 )
 STAGE_2 = Stage("F3-2", "Money Bags", "add and average with a condition", ITEMS_2, MISSIONS_2, ARENA_2)
 
@@ -132,7 +132,7 @@ MISSIONS_4 = (
             items=("F3.minifs",), wrong=("=MIN(G6:G25)",), uses=("MINIFS",)),
     formula("F3-4.M3", 'In M8 count the orders whose Units are at least the number in K6. Build the criteria with '
                        '">="&K6.', "Join with &.", "M8", '=COUNTIF(G6:G25,">="&K6)', sum(o.units >= 40 for o in ORDERS),
-            items=("F3.cell_criteria",), wrong=('=COUNTIF(G6:G25,">=K6")',), uses=("COUNTIF",), contains=("&",)),
+            items=("F3.cell_criteria",), wrong=('=COUNTIF(G6:G25,">=K6")',), uses=(("COUNTIF", "COUNTIFS"),), contains=("&",)),
     formula("F3-4.M4", "In M9 add the Revenue of orders dated from K9 to K11 (both included). Use SUMIFS with two "
                        "date pairs.", 'C6:C25,">="&K9 and C6:C25,"<="&K11.', "M9",
             '=SUMIFS(H6:H25,C6:C25,">="&K9,C6:C25,"<="&K11)',
@@ -149,13 +149,13 @@ BOSS_ARENA = orders_arena("CONDOR", {"L6": "North orders", "L7": "Gadget revenue
 BOSS_MISSIONS = (
     formula("F3-B.M1", "In M6 count the North orders.", "COUNTIF.", "M6", '=COUNTIF(D6:D25,"North")',
             sum(o.region == "North" for o in ORDERS), items=("F3.countif",), wrong=('=COUNTIF(D6:D25,"East")',),
-            uses=("COUNTIF",)),
+            uses=(("COUNTIF", "COUNTIFS"),)),
     formula("F3-B.M2", "In M7 add the Revenue of all Gadget orders.", "SUMIF.", "M7", '=SUMIF(F6:F25,"Gadget",H6:H25)',
             sum(o.revenue for o in ORDERS if o.product == "Gadget"), items=("F3.sumif",),
-            wrong=('=SUMIF(F6:F25,"Gizmo",H6:H25)',), uses=("SUMIF",)),
+            wrong=('=SUMIF(F6:F25,"Gizmo",H6:H25)',), uses=(("SUMIF", "SUMIFS"),)),
     formula("F3-B.M3", "In M8 average Lee's Units.", "AVERAGEIF.", "M8", '=AVERAGEIF(E6:E25,"Lee",G6:G25)',
             mean(o.units for o in ORDERS if o.rep == "Lee"), items=("F3.averageif",),
-            wrong=('=AVERAGEIF(E6:E25,"Lee",H6:H25)',), uses=("AVERAGEIF",)),
+            wrong=('=AVERAGEIF(E6:E25,"Lee",H6:H25)',), uses=(("AVERAGEIF", "AVERAGEIFS"),)),
     formula("F3-B.M4", "In M9 count South orders with more than 20 units.", "COUNTIFS.", "M9",
             '=COUNTIFS(D6:D25,"South",G6:G25,">20")', sum(o.region == "South" and o.units > 20 for o in ORDERS),
             items=("F3.countifs",), wrong=('=COUNTIF(D6:D25,"South")',), uses=("COUNTIFS",)),
@@ -168,7 +168,7 @@ BOSS_MISSIONS = (
             wrong=('=MAXIFS(G6:G25,D6:D25,"East")',), uses=("MINIFS",)),
     formula("F3-B.M7", 'In M12 count orders with Units ≥ K6, building the criteria with ">="&K6.', "Join with &.",
             "M12", '=COUNTIFS(G6:G25,">="&K6)', sum(o.units >= 40 for o in ORDERS), items=("F3.cell_criteria",),
-            wrong=('=COUNTIFS(G6:G25,">=K6")',), uses=("COUNTIFS",), contains=("&",)),
+            wrong=('=COUNTIFS(G6:G25,">=K6")',), uses=(("COUNTIF", "COUNTIFS"),), contains=("&",)),
     formula("F3-B.M8", "In M13 add the Revenue dated from K9 to K11.", "Two date pairs.", "M13",
             '=SUMIFS(H6:H25,C6:C25,">="&K9,C6:C25,"<="&K11)', sum(o.revenue for o in ORDERS if START <= o.date <= END),
             items=("F3.date_range",), wrong=('=SUMIFS(H6:H25,C6:C25,"<="&K11)',), uses=("SUMIFS",), contains=("&",)),

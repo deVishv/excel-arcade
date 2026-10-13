@@ -56,6 +56,12 @@ def test_value_uses_find_with_boundaries_not_search():
     assert "SEARCH(" not in t and "add $" in t
 
 
+def test_uses_accepts_alternatives():
+    t = C.Value("M6", 4, '=COUNTIF(«@D6:D25»,"North")', uses=(("COUNTIF", "COUNTIFS"), "ROUND")).formula().template
+    assert '&"COUNTIF"&"(",' in t and '&"COUNTIFS"&"(",' in t and '&"ROUND"&"(",' in t
+    assert "use COUNTIF/COUNTIFS and ROUND" in t
+
+
 def test_filled_names_each_expectation():
     f = C.Filled(("C6", "C7"), (1.6, 2.8), ("=«@B6»*«@E5»", "=«@B7»*«@E5»"))
     assert [kv.template for kv in f.key_values()] == ["=«@B6»*«@E5»", "=«@B7»*«@E5»"]

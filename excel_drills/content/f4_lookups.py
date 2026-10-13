@@ -175,10 +175,10 @@ BOSS_MISSIONS = (
            "J9:J12", lambda c: f"=XLOOKUP(I{_r(c)},$B$6:$B$20,$F$6:$F$20)", [BY_ID[i].stock for i in BOSS_IDS],
            items=("F4.lock_ranges",), wrong_for=lambda c: f"=XLOOKUP(I{_r(c)},B{_r(c) - 3}:B{_r(c) + 11},"
                                                           f"F{_r(c) - 3}:F{_r(c) + 11})",
-           uses=("XLOOKUP",), dollar=True),
+           uses=(("XLOOKUP", "VLOOKUP", "INDEX"),), dollar=True),
     formula("F4-B.M3", 'In J15 look up the Product for I15 and show "Not found" when it is missing.', "4th argument.",
             "J15", '=XLOOKUP(I15,B6:B20,C6:C20,"Not found")', "Not found", items=("F4.if_not_found",),
-            wrong=("=XLOOKUP(I15,B6:B20,C6:C20)",), uses=("XLOOKUP",)),
+            wrong=("=XLOOKUP(I15,B6:B20,C6:C20)",), uses=(("XLOOKUP", "VLOOKUP", "INDEX"),)),
     spill("F4-B.M4", "In J18 return the Price AND the Stock of I18 with one XLOOKUP.", "Return array E6:F20.", "J18",
           "=XLOOKUP(I18,B6:B20,E6:F20)", [[BY_ID["P-13"].price, BY_ID["P-13"].stock]], items=("F4.multi_return",),
           wrong=("=XLOOKUP(I18,B6:B20,E6:E20)",), uses=("XLOOKUP",)),
@@ -193,7 +193,7 @@ BOSS_MISSIONS = (
             wrong=("=XMATCH(I27,B6:B20)",), uses=("XMATCH",)),
     formula("F4-B.M8", "In J30 find the discount tier for the quantity in I30 from L6:M9.", "match_mode -1.", "J30",
             "=XLOOKUP(I30,L6:L9,M6:M9,,-1)", tier(120), items=("F4.xlookup_approx",),
-            wrong=("=XLOOKUP(I30,L6:L9,M6:M9)",), uses=("XLOOKUP",), contains=("-1",)),
+            wrong=("=XLOOKUP(I30,L6:L9,M6:M9)",), uses=(("XLOOKUP", "VLOOKUP"),)),
 )
 
 WORLD = World(

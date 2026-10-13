@@ -56,6 +56,20 @@ def uses_fn(cell: str, fn: str) -> str:
     return f"OR(ISNUMBER(FIND({starts}&{q(fn.upper() + '(')},UPPER(FORMULATEXT({cell})))))"
 
 
+Uses = tuple  # each entry is a function name, or a tuple of names any one of which will do
+
+
+def uses_all(cell: str, uses: Uses) -> str:
+    """TRUE when the formula in `cell` uses every required function (one of each group of alternatives)."""
+    parts = [uses_fn(cell, u) if isinstance(u, str) else "OR(" + ",".join(uses_fn(cell, f) for f in u) + ")"
+             for u in uses]
+    return "AND(" + ",".join(parts) + ")"
+
+
+def uses_text(uses: Uses) -> str:
+    return " and ".join(u if isinstance(u, str) else "/".join(u) for u in uses)
+
+
 @dataclass(frozen=True)
 class CheckFormula:
     template: str
@@ -183,8 +197,7 @@ def verdict(cells: list[str], keys: list[str], expects: list[object], *, uses=()
     for text in reversed(tuple(contains)):
         tail = f"IF(ISNUMBER(FIND({q(text)},FORMULATEXT({first}))),{tail},{q('✘ CLOSE · your formula needs ' + text)})"
     if uses:
-        need = " and ".join(uses)
-        tail = f"IF(AND({','.join(uses_fn(first, f) for f in uses)}),{tail},{q('✘ CLOSE · right value, but use ' + need)})"
+        tail = f"IF({uses_all(first, uses)},{tail},{q('✘ CLOSE · right value, but use ' + uses_text(uses))})"
     return (f'=IF({blank},"",IF({typed},{typed_msg},IF({has_error},{error_msg},'
             f"IF(NOT({value_ok}),{q(T.BAD)},{tail}))))")
 
@@ -194,7 +207,7 @@ class Value(Check):
     cell: str
     expect: object
     expect_formula: str
-    uses: tuple[str, ...] = ()
+    uses: Uses = ()
     contains: tuple[str, ...] = ()
     dollar: bool = False
     case_sensitive: bool = False
@@ -214,7 +227,7 @@ class Filled(Check):
     cells: tuple[str, ...]
     expects: tuple[object, ...]
     expect_formulas: tuple[str, ...]
-    uses: tuple[str, ...] = ()
+    uses: Uses = ()
     contains: tuple[str, ...] = ()
     dollar: bool = False
     case_sensitive: bool = False
@@ -239,7 +252,7 @@ class Spill(Check):
     anchor: str
     expect: tuple[tuple[object, ...], ...]
     expect_formula: str
-    uses: tuple[str, ...] = ()
+    uses: Uses = ()
 
     def spill(self):
         return KeyValue(self.expect[0][0], self.expect_formula)
@@ -251,8 +264,7 @@ class Spill(Check):
                 f"SUM(--({A}={K}))=ROWS({K})*COLUMNS({K})),FALSE)")
         ok = q(T.OK)
         if self.uses:
-            ok = (f"IF(AND({','.join(uses_fn(a, f) for f in self.uses)}),{ok},"
-                  f"{q('✘ CLOSE · right result, but use ' + ' and '.join(self.uses))})")
+            ok = f"IF({uses_all(a, self.uses)},{ok},{q('✘ CLOSE · right result, but use ' + uses_text(self.uses))})"
         t = (f'=IF(ISBLANK({a}),"",IF(NOT(ISFORMULA({a})),{q(T.TYPED)},'
              f"IF(ISERROR({a}),{q('✘ Your formula returns ')}&{error_name(a)},IF({same},{ok},{q(T.BAD)}))))")
         return CheckFormula(t, "")

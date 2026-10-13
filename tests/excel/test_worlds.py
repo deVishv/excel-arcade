@@ -180,6 +180,24 @@ def test_full_playthrough(code, built, excel):
         assert read(wb, b.hub["rank"]) == "S"
 
 
+ALTERNATIVES = [   # equally right formulas a learner knows from the course (found in review)
+    ("F3", "F3-B.M1", '=COUNTIFS(D6:D25,"North")'),
+    ("F3", "F3-B.M7", '=COUNTIF(G6:G25,">="&K6)'),
+    ("F4", "F4-B.M8", "=VLOOKUP(I30,L6:M9,2,TRUE)"),
+    ("F5", "F5-B.M4", '=RIGHT(B9,LEN(B9)-SEARCH(" ",B9))'),
+    ("F6", "F6-B.M6", "=DATE(YEAR(B7),MONTH(B7)+1,0)"),
+    ("F7", "F7-B.M6", "=ROWS(UNIQUE(F6:F25))"),
+]
+
+
+@pytest.mark.parametrize("code, mission, alt", ALTERNATIVES, ids=[a[1] for a in ALTERNATIVES])
+def test_equally_right_alternatives_are_accepted(code, mission, alt, built, excel):
+    b = built(code)
+    sheet, pc = next((s, pc) for s in b.sheets for pc in s.challenges if pc.challenge.id == mission)
+    got = _fresh_result(excel, b, sheet, pc, [Fixture("formula", f"«@{pc.challenge.arena_cell}»", alt)])
+    assert _ok(got), got
+
+
 def test_date_stamp_stays_clear_the_next_day(built, excel):
     """A Ctrl+; date is a constant, so its ✔ must survive midnight (found in review)."""
     b = built("D1")
