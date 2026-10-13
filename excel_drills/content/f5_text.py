@@ -87,7 +87,7 @@ ITEMS_3 = (
          ("SEARCH",), "Like FIND, but case-blind."),
     Item("F5.left_find", "concept", "LEFT + FIND", '=LEFT(A2,FIND("@",A2)-1) takes everything before the @.',
          "FIND supplies the cut point; -1 drops the @ itself.", "Which function supplies the cut position inside "
-         '=LEFT(A2, ____("@",A2)-1)?', ("FIND",), "The position finder."),
+         '=LEFT(A2, ____("@",A2)-1)?', ("FIND", "SEARCH"), "The position finder."),
 )
 ARENA_3 = Arena(
     cells={"B5": "Text", "B6": EMAIL, "B7": NAME, "C5": "Task", "C6": "Position of @", "C7": "Position of ARCADE",

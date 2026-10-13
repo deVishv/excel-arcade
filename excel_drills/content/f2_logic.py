@@ -32,7 +32,8 @@ ITEMS_1 = (
          "Which operator means 'not equal to'?", ("<>",), "Less-than then greater-than."),
     Item("F2.quotes", "concept", '"text"', "Text inside a formula goes in double quotes.",
          'Comparisons ignore case: ="YES"="yes" is TRUE.', "What must surround text inside a formula?",
-         ("quotes", "double quotes", "quotation marks", '"'), "Shift plus the apostrophe key."),
+         ("quotes", "double quotes", "double quote", "quote", "quotation marks", "quotation mark", '"'),
+         "Shift plus the apostrophe key."),
 )
 ARENA_1 = people_arena("VERDICT", {"F6": "Ava ≥ 50?", "F7": "Ben not No?", "F8": "Cy = yes?"}, ("G6:G8",),
                        labels=("F6:F8",))

@@ -46,6 +46,10 @@ def test_concept_answers_are_only_normalized():
     assert variants(('">50"', ">50"), "concept") == ['">50"', ">50"]
 
 
+def test_concept_answers_that_are_function_names_accept_function_forms():
+    assert set(variants(("MATCH",), "concept")) == {"MATCH", "=MATCH", "MATCH()", "=MATCH()", "MATCH(", "=MATCH("}
+
+
 def test_too_many_variants_rejected():
     many = tuple(f"Ctrl+{c}" for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%")
     with pytest.raises(ValueError):

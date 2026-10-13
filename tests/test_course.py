@@ -46,6 +46,15 @@ def test_pick_correct_option_answers_the_question(course):
             assert ch.prompt == f"Which move is this? {item.what}", item_id
 
 
+def test_recall_accepts_equally_right_answers():
+    from excel_drills.content import FINAL, WORLDS
+    course = Course(WORLDS, FINAL)
+    assert {"XMATCH", "MATCH()", "=MATCH("} <= set(course.accepted("F4.index_match"))
+    assert "SEARCH" in course.accepted("F5.left_find")
+    assert "DOUBLEQUOTE" in course.accepted("F2.quotes")
+    assert "UNIQUE()" in course.accepted("F7.nesting")
+
+
 def test_pick_is_deterministic(course):
     for item_id in course.items:
         assert course.pick(item_id, "a").check.choices == course.pick(item_id, "a").check.choices

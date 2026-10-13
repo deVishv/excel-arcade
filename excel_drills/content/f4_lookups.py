@@ -107,7 +107,7 @@ ITEMS_4 = (
          "It finds a match."),
     Item("F4.index_match", "concept", "INDEX+MATCH", "=INDEX(return_range, MATCH(value, lookup_range, 0)) looks up "
          "in any direction.", "Works even when the answer is LEFT of the lookup column.", "Which function goes inside "
-         "INDEX to find the row position?", ("MATCH",), "The position finder."),
+         "INDEX to find the row position?", ("MATCH", "XMATCH"), "The position finder."),
     Item("F4.xmatch", "function", "XMATCH", "Modern MATCH: exact match by default.", "=XMATCH(\"Kiwi\",C6:C20)",
          "Which modern function returns a position with an exact match by default?", ("XMATCH",), "X plus MATCH."),
 )

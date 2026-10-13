@@ -40,6 +40,7 @@ REPLACEMENTS: tuple[tuple[str, str], ...] = (
 MODIFIERS = ("CTRL", "SHIFT", "ALT")
 MAX_VARIANTS = 40
 _SEPARATORS = ("+", ",", ">", "")
+_FUNCTION_NAME = re.compile(r"[A-Z][A-Z0-9.]+")
 
 
 def normalize(text: object) -> str:
@@ -94,8 +95,8 @@ def variants(answers: tuple[str, ...], kind: str) -> list[str]:
             out |= _shortcut_variants(answer)
         elif kind == "function":
             out |= _function_variants(answer)
-        elif kind == "concept":
-            out.add(normalize(answer))
+        elif kind == "concept":              # an answer that is a function name also accepts =NAME, NAME() …
+            out |= _function_variants(answer) if _FUNCTION_NAME.fullmatch(answer) else {normalize(answer)}
         else:
             raise ValueError(f"unknown item kind {kind!r}")
     result = sorted(out)
