@@ -16,7 +16,8 @@ HOW_TO = (
     "4 · Formatting or hiding drills: press F9 to refresh the check. Tab jumps between yellow cells.",
 )
 REQUIREMENTS = "Needs Windows with Microsoft Excel 365 or 2021+ (English). In Protected View, click Enable Editing."
-REPLAY = "Replay a stage: select its yellow answer cells and press Delete. Undo an arena drill with Ctrl+Z."
+REPLAY = ("Replay a stage: select a run of its yellow cells (Ctrl+click to add more), then press Delete. "
+          "Undo an arena drill with Ctrl+Z.")
 WIDTHS = {"A": 16, "B": 32, "C": 16, "D": 12, "E": 16, "F": 36}
 
 

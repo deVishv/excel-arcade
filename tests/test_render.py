@@ -117,3 +117,9 @@ def test_hub_and_cheat_codes(tmp_path):
     links = [cell.hyperlink.location for row in h.iter_rows() for cell in row if cell.hyperlink]
     assert "'S9-1 Demo'!A1" in links and "Boss!A1" in links
     assert c["B5"].value == "Ctrl+A" and c.protection.sheet
+
+
+def test_replay_tip_says_how_to_select_around_locked_cells():
+    from excel_drills.hub_sheet import REPLAY
+    # a selection that includes a locked cell can't be cleared on a protected sheet (found in review)
+    assert "Ctrl+click" in REPLAY and "yellow" in REPLAY and "Delete" in REPLAY

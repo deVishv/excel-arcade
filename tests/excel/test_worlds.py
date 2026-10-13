@@ -198,6 +198,26 @@ def test_equally_right_alternatives_are_accepted(code, mission, alt, built, exce
     assert _ok(got), got
 
 
+def test_replay_tip_clears_a_stage_on_its_protected_sheet(built, excel):
+    """The hub's replay tip: select runs of yellow cells (Ctrl+click for more) and press Delete."""
+    b = built("D1")
+    typed = [pc for pc in b.sheets[0].challenges if pc.challenge.kind in ("RECALL", "PICK", "FIND", "SELF")]
+    with excel.open(b.path) as wb:
+        for pc in typed:
+            for fx in pc.challenge.solve:
+                apply(wb, fx, pc.names, pc.arena_sheet)
+            apply(wb, Fixture("pick_hint", ""), pc.names, pc.arena_sheet)
+        excel.calc()
+        assert all(read(wb, pc.xp) == 5 for pc in typed)
+        selection = rng(wb, typed[0].names["ans"])
+        for pc in typed:
+            for ref in (pc.names["ans"], pc.picker):
+                selection = wb.Application.Union(selection, rng(wb, ref))
+        selection.ClearContents()                       # what Delete does on that multi-run selection
+        excel.calc()
+        assert all(read(wb, pc.xp) == 0 and read(wb, pc.result) in ("", None) for pc in typed)
+
+
 def test_date_stamp_stays_clear_the_next_day(built, excel):
     """A Ctrl+; date is a constant, so its ✔ must survive midnight (found in review)."""
     b = built("D1")
