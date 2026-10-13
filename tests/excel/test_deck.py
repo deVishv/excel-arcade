@@ -27,6 +27,23 @@ def test_deck_opens_clean(deck, excel):
         assert not spills, spills[:20]
 
 
+def test_suggested_box_stops_once_stamped_today(deck, excel):
+    """After Box is set and the date stamped, re-checking must not promote the card again (found in review)."""
+    course, built = deck
+    card = built.cards[0]
+    r = card.row
+    with excel.open(built.path) as wb:
+        ws = wb.Worksheets("Deck")
+        today = wb.Application.Evaluate("TODAY()")
+        ws.Range(f"E{r}").Value2 = course.items[card.item_id].answers[0]
+        excel.calc()
+        assert read_cell(wb, "Deck", f"G{r}") == 2
+        ws.Range(f"H{r}").Value2 = 2
+        ws.Range(f"I{r}").Value2 = today
+        excel.calc()
+        assert read_cell(wb, "Deck", f"G{r}") == "done today"
+
+
 def test_deck_schedules_cards(deck, excel):
     course, built = deck
     card = built.cards[0]

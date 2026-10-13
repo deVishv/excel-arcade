@@ -27,7 +27,7 @@ ROUTINE = (
     "1 · Open the Deck sheet, select the Status header (K4), press Alt+↓ and keep only DUE (plus any NEW cards).",
     "2 · Type each answer in the yellow Your answer cell and check the Result.",
     "3 · Set Box to the Suggested box (select the Box cell, press Alt+↓, pick the number).",
-    "4 · Select Last reviewed and press Ctrl+; to stamp today's date.",
+    "4 · Select Last reviewed and press Ctrl+; to stamp today's date (Suggested box then says done today).",
     "5 · Clear your answers (select them, press Delete), then clear the filter (Alt+↓ → Select All).",
     "6 · Come back tomorrow: a little every day is how it sticks.",
 )
@@ -83,8 +83,9 @@ def _write_deck(book: Book, ws, key: KeySheet, course: Course) -> list[Card]:
         ws.data_validation(f"E{r}", {"validate": "any", "input_title": "Type your answer",
                                      "input_message": "Keys joined with +, like Ctrl+Shift+L, or a function name."})
         book.formula(ws, f"F{r}", res(check.formula().template), "", f("result"))
-        book.formula(ws, f"G{r}", f'=IF(F{r}="","",IF(LEFT(F{r},1)="✔",MIN(IF(H{r}="",1,H{r})+1,5),1))', "",
-                     f("calc_center"))
+        # once stamped today the suggestion stops, so re-checking can't promote the card twice
+        book.formula(ws, f"G{r}", f'=IF(F{r}="","",IF(I{r}=TODAY(),"done today",'
+                                  f'IF(LEFT(F{r},1)="✔",MIN(IF(H{r}="",1,H{r})+1,5),1)))', "", f("calc_center"))
         ws.write_blank(f"H{r}", None, f("input"))
         ws.data_validation(f"H{r}", {"validate": "list", "source": [1, 2, 3, 4, 5], "input_title": "Box 1-5",
                                      "input_message": "Press Alt+Down and pick the Suggested box."})
