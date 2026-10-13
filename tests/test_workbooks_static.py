@@ -21,6 +21,9 @@ def _built(tmp_path_factory):
     books = [build_world(Course((DEMO,)), DEMO, out)]
     real = Course(WORLDS, FINAL)
     books += [build_world(real, w, out) for w in WORLDS]
+    from excel_drills.final_builder import build_final
+    if FINAL is not None:
+        books.append(build_final(real, out))
     return books
 
 

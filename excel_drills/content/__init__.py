@@ -10,6 +10,6 @@ from .f4_lookups import WORLD as F4
 from .f5_text import WORLD as F5
 from .f6_dates import WORLD as F6
 from .f7_dynamic import WORLD as F7
+from .final_boss import FINAL
 
 WORLDS: tuple = (S1, F1, S2, F2, S3, F3, S4, F4, F5, F6, F7)
-FINAL = None

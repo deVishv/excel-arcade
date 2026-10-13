@@ -10,6 +10,7 @@ from .world_builder import build_world
 
 def build_all(out_dir: Path, *, only: str | None = None) -> list[Path]:
     from .content import FINAL, WORLDS
+    from .final_builder import build_final
 
     course = Course(WORLDS, FINAL)
     if only is None:
@@ -17,7 +18,10 @@ def build_all(out_dir: Path, *, only: str | None = None) -> list[Path]:
         if problems:
             raise SystemExit("Content problems:\n  " + "\n  ".join(problems))
     out_dir.mkdir(parents=True, exist_ok=True)
-    return [build_world(course, w, out_dir).path for w in course.worlds if only in (None, w.code)]
+    paths = [build_world(course, w, out_dir).path for w in course.worlds if only in (None, w.code)]
+    if FINAL is not None and only in (None, "FINAL"):
+        paths.append(build_final(course, out_dir).path)
+    return paths
 
 
 def main(argv=None) -> None:
