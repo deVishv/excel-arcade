@@ -14,27 +14,37 @@ from .stage_sheet import PROTECT, render_round
 from .world_builder import BuiltWorkbook
 from .writer import Book, row_height
 
-TIMER = ("C40", "C41", "C42")                 # START, FINISH, TIME (minutes) on the Start sheet
+FINAL_HOW_TO = (
+    "1 · Speedrun: stamp START just below (Ctrl+Shift+:) before Round 1 and FINISH after Round 3. Beat par for rank S.",
+    "2 · Each round: answer its GAUNTLET recall questions (if it has any), then do the MISSIONS in its arena.",
+    "3 · Yellow cells are yours: type, pick from a list (Alt+↓), or follow a ▶ ARENA link and do the move there.",
+    "4 · ✔ CLEAR = right · ✘ = try again · · not yet = drill not done. Stuck? Pick 'Show hint' (5 XP instead of 10).",
+    "5 · Formatting drills: press F9 to refresh the check. Tab jumps between yellow cells.",
+)
+# START, FINISH, TIME (minutes) on the Start sheet, one blank row under the hub's Replay note
+# (tests/test_final_static.py pins the position if the hub layout changes).
+TIMER = ("C26", "C27", "C28")
 
 
 def _timer(book: Book, ws, par: int) -> None:
     f = book.fmt
     start, finish, time = TIMER
-    book.text(ws, "A39", "SPEEDRUN · stamp START before Round 1 and FINISH after Round 3", f("band"))
+    top = int(start[1:])
+    book.text(ws, f"A{top - 1}", "SPEEDRUN · stamp START before Round 1 and FINISH after Round 3", f("band"))
     for col in "BCDEF":
-        ws.write_blank(f"{col}39", None, f("band"))
+        ws.write_blank(f"{col}{top - 1}", None, f("band"))
     stamp = {"validate": "any", "input_title": "Stamp the time", "input_message": "Press Ctrl+Shift+: to type the time."}
-    book.text(ws, "B40", "START (Ctrl+Shift+:)", f("label"))
+    book.text(ws, f"B{top}", "START (Ctrl+Shift+:)", f("label"))
     ws.write_blank(start, None, f("input_time"))
     ws.data_validation(start, stamp)
-    book.text(ws, "B41", "FINISH (Ctrl+Shift+:)", f("label"))
+    book.text(ws, f"B{top + 1}", "FINISH (Ctrl+Shift+:)", f("label"))
     ws.write_blank(finish, None, f("input_time"))
     ws.data_validation(finish, stamp)
-    book.text(ws, "B42", "TIME", f("label"))
+    book.text(ws, f"B{top + 2}", "TIME", f("label"))
     book.formula(ws, time, f'=IF(OR({start}="",{finish}=""),"",ROUND(MOD({finish}-{start},1)*1440,0))', "",
                  f("calc_minutes"))
-    book.text(ws, "B43", "PAR", f("label"))
-    book.put(ws, "C43", par, f("calc_minutes"))
+    book.text(ws, f"B{top + 3}", "PAR", f("label"))
+    book.put(ws, f"C{top + 3}", par, f("calc_minutes"))
 
 
 def _certificate(book: Book, ws, rank_ref: str) -> None:
@@ -83,7 +93,8 @@ def build_final(course: Course, out_dir: Path) -> BuiltWorkbook:
                                    next_label=f"{nxt.code} {nxt.name}" if nxt else "Certificate", extra_names=extra))
     hub = render_hub(book, hub_ws, title="FINAL BOSS ▸ THE CHAMPIONSHIP",
                      tagline="Every shortcut and formula from the course in one championship. Beat par for rank S.",
-                     sheets=placed, boss=None, timer_cell=sheet_ref("Start", TIMER[2]), par=final.par_minutes)
+                     sheets=placed, boss=None, how_to=FINAL_HOW_TO, timer_cell=sheet_ref("Start", TIMER[2]),
+                     par=final.par_minutes)
     _timer(book, hub_ws, final.par_minutes)
     _certificate(book, cert_ws, hub["rank"])
     hub_ws.activate()
