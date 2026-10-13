@@ -29,3 +29,14 @@ def test_workday_helpers():
     assert workday_count(dt.date(2026, 3, 16), dt.date(2026, 3, 20)) == 5        # Mon..Fri
     assert workday_count(dt.date(2026, 3, 15), dt.date(2026, 3, 15)) == 0        # a Sunday
     assert add_workdays(dt.date(2026, 3, 13), 1) == dt.date(2026, 3, 16)         # Fri + 1 workday = Mon
+
+
+from excel_drills.content.f6_dates import add_months, end_of_month, full_months, full_years, weekday_excel
+
+
+def test_date_helpers_match_excel_semantics():
+    assert weekday_excel(dt.date(2026, 3, 15)) == 1                       # Sunday
+    assert add_months(dt.date(2026, 1, 31), 1) == dt.date(2026, 2, 28)    # EDATE clamps to month end
+    assert end_of_month(dt.date(2026, 2, 10)) == dt.date(2026, 2, 28)
+    assert full_years(dt.date(1990, 8, 20), dt.date(2026, 3, 15)) == 35
+    assert full_months(dt.date(2026, 3, 15), dt.date(2026, 5, 1)) == 1
