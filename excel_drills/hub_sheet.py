@@ -96,7 +96,8 @@ def render_hub(book: Book, ws, *, title: str, tagline: str, sheets: list[PlacedS
     b.text(ws, f"A{r}", "NEXT UP", f("label"))
     if sheets:
         pick = f'MATCH("☆☆☆",$D${first}:$D${last_stage},0)'
-        after = (f'IF({boss.gate}="OPEN","the Boss","All clear! Aim for rank S")' if boss
+        # every stage starred means the gate is open: point at the Boss until it is defeated
+        after = (f'IF({refs[f"status:{boss.code}"]}="DEFEATED","All clear! Aim for rank S","the Boss")' if boss
                  else '"All clear! Aim for rank S"')
         b.formula(ws, f"B{r}", f'=IFERROR(INDEX($A${first}:$A${last_stage},{pick})&" "&'
                                f'INDEX($B${first}:$B${last_stage},{pick}),{after})',

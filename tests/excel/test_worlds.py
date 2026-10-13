@@ -159,6 +159,7 @@ def test_full_playthrough(code, built, excel):
                     apply(wb, fx, pc.names, pc.arena_sheet)
         excel.calc()
         assert read(wb, boss.gate) == "OPEN"
+        assert read(wb, b.hub["next"]) == "the Boss"
         for pc in boss.challenges:
             for fx in pc.challenge.solve:
                 apply(wb, fx, pc.names, pc.arena_sheet)
@@ -171,6 +172,7 @@ def test_full_playthrough(code, built, excel):
         for s in stages:
             assert read(wb, b.hub[f"status:{s.code}"]) == "PERFECT"
         assert read(wb, b.hub["status:BOSS"]) == "DEFEATED"
+        assert read(wb, b.hub["next"]) == "All clear! Aim for rank S"     # found in review: stuck on "the Boss"
         assert read(wb, b.hub["rank"]) == "A"                      # 100% but no time stamped yet
         sheet_name, _ = split_ref(boss.time_cell)
         bws = wb.Worksheets(sheet_name)
