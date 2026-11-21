@@ -1,4 +1,4 @@
-"""Shortcuts 3 · Format — dress numbers, text and cells from the keyboard."""
+"""Shortcuts 3: Format. Format numbers, text and cells from the keyboard."""
 from ..checks import format_in, prefix_is
 from ..model import Arena, Boss, Fixture, Item, Stage, World, do, merge, row, self_check, table
 from ..refs import cells_in
@@ -15,7 +15,7 @@ def fmt_do(id, prompt, hint, rng, codes, *, solve_fmt, wrong_fmt, items, wrong_r
               items=items, arena_cell=rng.split(":")[0], f9=True)
 
 
-# ------------------------------------------------------------------------------------ S3-1 Number Skins
+# ------------------------------------------------------------------------------------ S3-1 Number Formats
 ITEMS_1 = (
     Item("S3.currency", "shortcut", "Ctrl+Shift+$", "Currency format with two decimals.",
          "Negative amounts show in parentheses.", "Which keys apply the Currency format?",
@@ -55,13 +55,13 @@ MISSIONS_1 = (
            "Ctrl+Shift+3.", "E6:E10", DATE, solve_fmt="d-mmm-yy", wrong_fmt="0", items=("S3.date",)),
     fmt_do("S3-1.M5", "Select F6:F10 and press Ctrl+Shift+@: the fractions become times. Then press F9.",
            "Ctrl+Shift+2.", "F6:F10", TIME, solve_fmt="h:mm AM/PM", wrong_fmt="0.00", items=("S3.time",)),
-    fmt_do("S3-1.M6", "G6:G10 are dressed as currency. Select them and press Ctrl+Shift+~ to strip the format. "
+    fmt_do("S3-1.M6", "G6:G10 have a currency format. Select them and press Ctrl+Shift+~ to remove it. "
                       "Then press F9.", "Ctrl+Shift plus the key left of 1.", "G6:G10", GENERAL,
            solve_fmt="General", wrong_fmt="0%", items=("S3.general",)),
 )
-STAGE_1 = Stage("S3-1", "Number Skins", "change how numbers look in one keystroke", ITEMS_1, MISSIONS_1, ARENA_1)
+STAGE_1 = Stage("S3-1", "Number Formats", ITEMS_1, MISSIONS_1, ARENA_1)
 
-# ------------------------------------------------------------------------------------ S3-2 Text Style
+# ------------------------------------------------------------------------------------ S3-2 Text Styles
 ITEMS_2 = (
     Item("S3.bold", "shortcut", "Ctrl+B", "Bold on or off.", "Ctrl+2 does the same.", "Which keys toggle bold?",
          ("Ctrl+B", "Ctrl+2"), "B for Bold."),
@@ -69,7 +69,7 @@ ITEMS_2 = (
          ("Ctrl+I", "Ctrl+3"), "I for Italic."),
     Item("S3.underline", "shortcut", "Ctrl+U", "Underline on or off.", "Ctrl+4 does the same.",
          "Which keys toggle underline?", ("Ctrl+U", "Ctrl+4"), "U for Underline."),
-    Item("S3.strike", "shortcut", "Ctrl+5", "Strikethrough on or off.", "Handy for crossing off done tasks.",
+    Item("S3.strike", "shortcut", "Ctrl+5", "Strikethrough on or off.", "Use it to cross off finished items in a list.",
          "Which keys toggle strikethrough?", ("Ctrl+5",), "Ctrl plus a number key."),
 )
 ARENA_2 = Arena(cells={"B6": "Make me bold", "B7": "Make me italic", "B8": "Underline me", "B9": "Strike me out"},
@@ -79,9 +79,9 @@ MISSIONS_2 = (
                           "struck through (Ctrl+5). Then pick Done here.", "Select each cell, then press its keys.",
                items=("S3.bold", "S3.italic", "S3.underline", "S3.strike")),
 )
-STAGE_2 = Stage("S3-2", "Text Style", "emphasize text without the ribbon", ITEMS_2, MISSIONS_2, ARENA_2)
+STAGE_2 = Stage("S3-2", "Text Styles", ITEMS_2, MISSIONS_2, ARENA_2)
 
-# ------------------------------------------------------------------------------------ S3-3 Format Power
+# ------------------------------------------------------------------------------------ S3-3 Format Cells and KeyTips
 ITEMS_3 = (
     Item("S3.format_cells", "shortcut", "Ctrl+1", "Open Format Cells: every number, alignment, font and border option.",
          "Ctrl+1 then Tab through the choices.", "Which keys open the Format Cells dialog?", ("Ctrl+1",),
@@ -126,7 +126,7 @@ MISSIONS_3 = (
                           "give the cells a yellow fill with Alt, H, H. Pick Done here.", "Borders first, then fill.",
                items=("S3.border", "S3.no_border", "S3.fill_color")),
 )
-STAGE_3 = Stage("S3-3", "Format Power", "reach every format option from the keyboard", ITEMS_3, MISSIONS_3, ARENA_3)
+STAGE_3 = Stage("S3-3", "Format Cells and KeyTips", ITEMS_3, MISSIONS_3, ARENA_3)
 
 # ------------------------------------------------------------------------------------ Boss
 BOSS_ARENA = Arena(
@@ -144,7 +144,7 @@ BOSS_MISSIONS = (
            solve_fmt="d-mmm-yy", wrong_fmt="0", items=("S3.date",)),
     fmt_do("S3-B.M4", "Make E6:E8 times (Ctrl+Shift+@). Press F9.", "Ctrl+Shift+2.", "E6:E8", TIME,
            solve_fmt="h:mm AM/PM", wrong_fmt="0.00", items=("S3.time",)),
-    fmt_do("S3-B.M5", "F6:F8 wear currency. Reset them to General (Ctrl+Shift+~). Press F9.", "Ctrl+Shift+~.",
+    fmt_do("S3-B.M5", "F6:F8 have a currency format. Reset them to General (Ctrl+Shift+~). Press F9.", "Ctrl+Shift+~.",
            "F6:F8", GENERAL, solve_fmt="General", wrong_fmt="0%", items=("S3.general",)),
     fmt_do("S3-B.M6", "Give G6:G8 exactly 1 decimal place through Ctrl+1. Press F9.", "Format Cells → Number.",
            "G6:G8", ONE_DP, solve_fmt="0.0", wrong_fmt="0.000", items=("S3.format_cells",)),
@@ -157,7 +157,7 @@ BOSS_MISSIONS = (
 
 WORLD = World(
     code="S3", track="S", order=5, title="Format",
-    tagline="Dress numbers, text and cells from the keyboard.",
+    tagline="Format numbers, text and cells from the keyboard.",
     file_name="05 Shortcuts 3 - Format.xlsx",
     stages=(STAGE_1, STAGE_2, STAGE_3),
     boss=Boss(BOSS_MISSIONS, BOSS_ARENA, par_minutes=8),

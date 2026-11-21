@@ -18,18 +18,18 @@ COLUMNS = {"A": 7, "B": 8, "C": 22, "D": 52, "E": 24, "F": 20, "G": 11, "H": 8, 
 HEADERS = ("Card", "World", "Stage", "Prompt", "Your answer", "Result", "Suggested box", "Box", "Last reviewed",
            "Next due", "Status")
 HOW_IT_WORKS = (
-    "Every card lives in a box from 1 to 5. Box 1 cards come back tomorrow; Box 5 cards wait a month.",
-    "Intervals: Box 1 → 1 day · Box 2 → 3 days · Box 3 → 7 days · Box 4 → 14 days · Box 5 → 30 days.",
-    "Right answer: the card moves up a box. Missed it: back to Box 1. NEW cards haven't been reviewed yet.",
-    "Start with the cards from worlds you have played; leave the rest as NEW until you get there.",
+    "Each card sits in a box from 1 to 5. The box sets how long the card waits before it is due again.",
+    "Box 1: 1 day. Box 2: 3 days. Box 3: 7 days. Box 4: 14 days. Box 5: 30 days.",
+    "A correct answer moves the card up one box. A wrong answer sends it back to Box 1. NEW cards are not reviewed yet.",
+    "Review cards from the worlds you have played. Leave the rest as NEW until you reach them.",
 )
 ROUTINE = (
-    "1 · Open the Deck sheet, select the Status header (K4), press Alt+↓ and keep only DUE (plus any NEW cards).",
-    "2 · Type each answer in the yellow Your answer cell and check the Result.",
-    "3 · Set Box to the Suggested box (select the Box cell, press Alt+↓, pick the number).",
-    "4 · Select Last reviewed and press Ctrl+; to stamp today's date (Suggested box then says done today).",
-    "5 · Clear your answers (select them, press Delete), then clear the filter (Alt+↓ → Select All).",
-    "6 · Come back tomorrow: a little every day is how it sticks.",
+    "1. On the Deck sheet, select the Status header (K4), press Alt+↓ and keep only DUE, plus any NEW cards you want.",
+    "2. Type each answer in its yellow Your answer cell and read the Result.",
+    "3. Set Box to the Suggested box: select the Box cell, press Alt+↓ and pick the number.",
+    "4. Select Last reviewed and press Ctrl+; to stamp today's date. Suggested box then shows done today.",
+    "5. Clear your answers (select them, press Delete), then clear the filter (Alt+↓ on K4, then Select All).",
+    "6. Review the due cards again tomorrow.",
 )
 
 
@@ -57,12 +57,10 @@ def _write_deck(book: Book, ws, key: KeySheet, course: Course) -> list[Card]:
     f = book.fmt
     for col, width in COLUMNS.items():
         ws.set_column(f"{col}:{col}", width)
-    book.text(ws, "A1", "REVIEW DECK ▸ ALL CARDS", f("title"))
+    book.text(ws, "A1", "REVIEW DECK ▸ CARDS", f("title"))
     for col in "BCDEFGHIJK":
         ws.write_blank(f"{col}1", None, f("title_fill"))
     ws.set_row(0, 34)
-    book.text(ws, "A2", "Answer the DUE cards, move each to its Suggested box, and stamp the date with Ctrl+;.",
-              f("subtitle"))
     for col, label in zip("ABCDEFGHIJK", HEADERS):
         book.text(ws, f"{col}4", label, f("th"))
     cards, r = [], 5
@@ -121,11 +119,10 @@ def _write_start(book: Book, ws, last: int, total: int) -> dict[str, str]:
     ws.set_column("B:B", 14)
     ws.set_column("C:H", 12)
     ws.hide_gridlines(2)
-    book.text(ws, "A1", "REVIEW DECK ▸ YOUR DAILY 10 MINUTES", f("title"))
+    book.text(ws, "A1", "REVIEW DECK", f("title"))
     for col in "BCDEFGH":
         ws.write_blank(f"{col}1", None, f("title_fill"))
     ws.set_row(0, 34)
-    book.text(ws, "A2", "Every move from the course on a flashcard. A little every day beats cramming.", f("subtitle"))
     status, box = f"Deck!$K$5:$K${last}", f"Deck!$H$5:$H${last}"
     _band(book, ws, 4, "TODAY")
     rows = (("Cards due today", f'=COUNTIF({status},"DUE")', 0), ("New cards", f'=COUNTIF({status},"NEW")', total),

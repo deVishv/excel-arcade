@@ -1,8 +1,8 @@
 """Check types: each turns a challenge into an Excel verdict formula plus what the Key sheet must hold.
 
 Template placeholders (resolved by refs.resolve at layout time):
-  «ans» answer cell · «key» expected value · «key1»…«keyN» per-cell expectations · «keyrow»/«opts» list
-  on the Key row · «spill» expected spill anchor · «sheets» sheet count at build · «@B5» arena cell ·
+  «ans» answer cell; «key» expected value; «key1»…«keyN» per-cell expectations; «keyrow»/«opts» list
+  on the Key row; «spill» expected spill anchor; «sheets» sheet count at build; «@B5» arena cell;
   «#B21» INDIRECT arena cell (survives cut/paste).
 """
 from __future__ import annotations
@@ -193,11 +193,11 @@ def verdict(cells: list[str], keys: list[str], expects: list[object], *, uses=()
                                  for c, k, e in zip(cells, keys, expects)) + ")"
     tail = q(T.OK)
     if dollar:
-        tail = f'IF(ISNUMBER(FIND("$",FORMULATEXT({first}))),{tail},{q("✘ CLOSE · add $ so it fills correctly (F4)")})'
+        tail = f'IF(ISNUMBER(FIND("$",FORMULATEXT({first}))),{tail},{q("✘ Right value, but add $ so it fills correctly (F4)")})'
     for text in reversed(tuple(contains)):
-        tail = f"IF(ISNUMBER(FIND({q(text)},FORMULATEXT({first}))),{tail},{q('✘ CLOSE · your formula needs ' + text)})"
+        tail = f"IF(ISNUMBER(FIND({q(text)},FORMULATEXT({first}))),{tail},{q('✘ Right value, but the formula needs ' + text)})"
     if uses:
-        tail = f"IF({uses_all(first, uses)},{tail},{q('✘ CLOSE · right value, but use ' + uses_text(uses))})"
+        tail = f"IF({uses_all(first, uses)},{tail},{q('✘ Right value, but use ' + uses_text(uses))})"
     return (f'=IF({blank},"",IF({typed},{typed_msg},IF({has_error},{error_msg},'
             f"IF(NOT({value_ok}),{q(T.BAD)},{tail}))))")
 
@@ -264,7 +264,7 @@ class Spill(Check):
                 f"SUM(--({A}={K}))=ROWS({K})*COLUMNS({K})),FALSE)")
         ok = q(T.OK)
         if self.uses:
-            ok = f"IF({uses_all(a, self.uses)},{ok},{q('✘ CLOSE · right result, but use ' + uses_text(self.uses))})"
+            ok = f"IF({uses_all(a, self.uses)},{ok},{q('✘ Right result, but use ' + uses_text(self.uses))})"
         t = (f'=IF(ISBLANK({a}),"",IF(NOT(ISFORMULA({a})),{q(T.TYPED)},'
              f"IF(ISERROR({a}),{q('✘ Your formula returns ')}&{error_name(a)},IF({same},{ok},{q(T.BAD)}))))")
         return CheckFormula(t, "")
@@ -272,7 +272,7 @@ class Spill(Check):
 
 @dataclass(frozen=True)
 class Condition(Check):
-    """DO mission: ✔ when the condition holds, otherwise '· not yet' (a workbook can't tell untouched from wrong)."""
+    """DO mission: ✔ when the condition holds, otherwise '○ Not yet' (a workbook can't tell untouched from wrong)."""
     condition: str
     f9: bool = False            # formatting/hiding/structure drills: Excel may not recalc until F9
     volatile: bool = False      # result depends on today's date (TODAY/NOW)

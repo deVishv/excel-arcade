@@ -1,4 +1,4 @@
-"""Shortcuts 2 · Enter & Edit — type, fill, copy and stamp data at speed."""
+"""Shortcuts 2: Enter & Edit. Enter, fill, copy and stamp data quickly."""
 from ..checks import all_equal, cells_equal, line_break, time_constant, today_constant, values_not_formulas
 from ..model import Arena, Boss, Fixture, Formula, Item, Stage, World, do, filled, merge, row, table
 from ..refs import cells_in
@@ -9,13 +9,13 @@ ITEMS_1 = (
          "Enter alone moves down.", "Which keys confirm an entry and move up one cell?", ("Shift+Enter",),
          "Enter plus Shift."),
     Item("S2.tab", "shortcut", "Tab / Shift+Tab", "Confirm the entry and move right (Shift+Tab moves left).",
-         "On a protected sheet, Tab hops between input cells.",
+         "On a protected sheet, Tab moves between the unlocked cells.",
          "Which key confirms an entry and moves one cell to the right?", ("Tab",), "The key above Caps Lock."),
     Item("S2.ctrl_enter", "shortcut", "Ctrl+Enter", "Fill every selected cell with what you just typed.",
-         "Select a range, type once, press Ctrl+Enter: done.",
+         "Works with formulas too: relative references adjust in each cell.",
          "Which keys fill every selected cell with what you typed?", ("Ctrl+Enter",), "Enter plus Ctrl."),
     Item("S2.alt_enter", "shortcut", "Alt+Enter", "Start a new line inside the same cell.",
-         "Great for addresses and notes.", "Which keys start a new line inside the same cell?", ("Alt+Enter",),
+         "Use it for addresses and multi-line labels.", "Which keys start a new line inside the same cell?", ("Alt+Enter",),
          "Enter plus Alt."),
     Item("S2.esc", "shortcut", "Esc", "Cancel what you are typing; the cell stays unchanged.",
          "Esc also closes menus and dialogs.", "Which key cancels an entry and leaves the cell unchanged?",
@@ -27,8 +27,7 @@ ARENA_1 = Arena(
     labels=("F5", "F10"), widths={"D": 18},
 )
 MISSIONS_1 = (
-    do("S2-1.M1", "In the arena, select B6:B15 (click B6, then Shift+click B15), type DONE and press Ctrl+Enter. "
-                  "Every selected cell gets DONE.", "Ctrl+Enter instead of Enter.", all_equal(cells_in("B6:B15"), "DONE"),
+    do("S2-1.M1", "In the arena, select B6:B15 (click B6, then Shift+click B15), type DONE and press Ctrl+Enter.", "Ctrl+Enter instead of Enter.", all_equal(cells_in("B6:B15"), "DONE"),
        solve=[Fixture("type", "«@B6:B15»", "DONE")], wrong=[[Fixture("type", "«@B6»", "DONE")]],
        items=("S2.ctrl_enter",), arena_cell="B6"),
     do("S2-1.M2", "In D6 type Line 1, press Alt+Enter, type Line 2, then press Enter.", "Alt+Enter adds the break.",
@@ -43,9 +42,9 @@ MISSIONS_1 = (
        solve=[Fixture("type", "«@F12»", "Bottom"), Fixture("type", "«@F11»", "Top")],
        wrong=[[Fixture("type", "«@F11»", "Bottom")]], items=("S2.shift_enter",), arena_cell="F12"),
 )
-STAGE_1 = Stage("S2-1", "Quick Entry", "type and move without reaching for the mouse", ITEMS_1, MISSIONS_1, ARENA_1)
+STAGE_1 = Stage("S2-1", "Quick Entry", ITEMS_1, MISSIONS_1, ARENA_1)
 
-# ------------------------------------------------------------------------------------ S2-2 Clone Machine
+# ------------------------------------------------------------------------------------ S2-2 Copy, Paste and Fill
 MONTHS6 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
 BUDGET = {"Food": [120, 130, 125, 140, 150, 135], "Rent": [800, 800, 800, 820, 820, 820],
           "Fun": [60, 90, 45, 70, 110, 80], "Travel": [0, 0, 300, 0, 450, 0]}
@@ -56,13 +55,13 @@ ITEMS_2 = (
          "Which keys copy the selection?", ("Ctrl+C",), "C for Copy."),
     Item("S2.cut", "shortcut", "Ctrl+X", "Cut the selected cells, ready to move them.",
          "Paste with Ctrl+V to finish the move.", "Which keys cut the selection?", ("Ctrl+X",), "X looks like scissors."),
-    Item("S2.paste", "shortcut", "Ctrl+V", "Paste what you copied or cut.", "Paste into the top-left destination cell.",
+    Item("S2.paste", "shortcut", "Ctrl+V", "Paste what you copied or cut.", "Select only the top-left cell of the destination, then paste.",
          "Which keys paste?", ("Ctrl+V",), "Next to C on the keyboard."),
     Item("S2.paste_special", "shortcut", "Ctrl+Alt+V", "Open Paste Special: paste only values, formats and more.",
          "Ctrl+Alt+V, then V, then Enter pastes values only.", "Which keys open Paste Special?", ("Ctrl+Alt+V",),
          "Paste plus Alt."),
     Item("S2.ctrl_r", "shortcut", "Ctrl+R", "Fill Right: copy the left cell into the selected cells to its right.",
-         "The twin of Ctrl+D (Fill Down).", "Which keys copy the left cell into the selected cells to its right?",
+         "Ctrl+D does the same downward.", "Which keys copy the left cell into the selected cells to its right?",
          ("Ctrl+R",), "R for Right."),
     Item("S2.undo", "shortcut", "Ctrl+Z", "Undo the last action.", "Press again to undo further back.",
          "Which keys undo the last action?", ("Ctrl+Z",), "The bottom-left letter."),
@@ -96,9 +95,9 @@ MISSIONS_2 = (
        solve=[Fixture("cut_paste", "«@B22:D22»", None, ("«@B21»",))],
        wrong=[[Fixture("copy", "«@B22:D22»", None, ("«@B21»",))]], items=("S2.cut", "S2.paste"), arena_cell="B21"),
 )
-STAGE_2 = Stage("S2-2", "Clone Machine", "copy, move and fill without retyping", ITEMS_2, MISSIONS_2, ARENA_2)
+STAGE_2 = Stage("S2-2", "Copy, Paste and Fill", ITEMS_2, MISSIONS_2, ARENA_2)
 
-# ------------------------------------------------------------------------------------ S2-3 Stamps & Smart Fill
+# ------------------------------------------------------------------------------------ S2-3 Dates and Flash Fill
 NAMES = ["Ada Lovelace", "Alan Turing", "Grace Hopper", "Katherine Johnson", "Tim Berners-Lee",
          "Margaret Hamilton", "Linus Torvalds", "Hedy Lamarr"]
 FIRSTS = [n.split()[0] for n in NAMES]
@@ -138,8 +137,7 @@ MISSIONS_3 = (
        cells_equal({"C22": "Gold"}), solve=[Fixture("type", "«@C22»", "Gold")],
        wrong=[[Fixture("type", "«@C22»", "Silver")]], items=("S2.alt_down",), arena_cell="C22"),
 )
-STAGE_3 = Stage("S2-3", "Stamps & Smart Fill", "stamp dates and times, let Excel finish your pattern",
-                ITEMS_3, MISSIONS_3, ARENA_3)
+STAGE_3 = Stage("S2-3", "Dates and Flash Fill", ITEMS_3, MISSIONS_3, ARENA_3)
 
 # ------------------------------------------------------------------------------------ Boss
 BOSS_NAMES = ["Ada Lovelace", "Alan Turing", "Grace Hopper", "Hedy Lamarr", "Linus Torvalds", "Annie Easley"]
@@ -151,7 +149,7 @@ BOSS_ARENA = Arena(
     cells=merge(
         {"B5": "READY ▼", "D5": "ADDRESS ▼", "F5": "SIGNED ON ▼", "F8": "TIER ▼"},
         table("I5", ["Full name", "Last name"], [[n, None] for n in BOSS_NAMES]),
-        table("L5", ["Hero", "Power", "Level"], [[None, None, None], ["Nova", 88, 3]]),
+        table("L5", ["Name", "Score", "Level"], [[None, None, None], ["Nova", 88, 3]]),
         {"B14": "Team"}, row("C14", ["Q1", "Q2", "Q3", "Q4"]),
         {"B15": "TOTAL", "C15": Formula("=SUM(C16:C18)", QT[0])},
         *[merge({f"B{16 + i}": team}, row(f"C{16 + i}", vals)) for i, (team, vals) in enumerate(QDATA.items())],
@@ -195,7 +193,7 @@ BOSS_MISSIONS = (
 
 WORLD = World(
     code="S2", track="S", order=3, title="Enter & Edit",
-    tagline="Type, fill, copy and stamp data at speed.",
+    tagline="Enter, fill, copy and stamp data quickly.",
     file_name="03 Shortcuts 2 - Enter and Edit.xlsx",
     stages=(STAGE_1, STAGE_2, STAGE_3),
     boss=Boss(BOSS_MISSIONS, BOSS_ARENA, par_minutes=10),

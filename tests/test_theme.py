@@ -37,7 +37,7 @@ def test_fonts_and_sizes(name):
 def test_result_words_carry_symbols():
     assert T.OK.startswith("✔") and T.OK_SELF.startswith("✔")
     assert T.BAD.startswith("✘") and T.TYPED.startswith("✘")
-    assert T.NOT_YET.startswith("·") and T.NOT_YET_F9.startswith("·")
+    assert T.NOT_YET.startswith("○") and T.NOT_YET_F9.startswith("○")
 
 
 def test_formats_are_cached(tmp_path):

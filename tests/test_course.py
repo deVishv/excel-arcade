@@ -43,7 +43,7 @@ def test_pick_correct_option_answers_the_question(course):
         ch = course.pick(item_id, "X.T1")
         assert not ch.prompt.startswith("Type "), f"{item_id}: a dropdown question can't ask to type"
         if normalize(item.display) not in course.accepted(item_id):
-            assert ch.prompt == f"Which move is this? {item.what}", item_id
+            assert ch.prompt == f"Which one matches this description? {item.what}", item_id
 
 
 def test_recall_accepts_equally_right_answers():

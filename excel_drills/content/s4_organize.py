@@ -1,10 +1,10 @@
-"""Shortcuts 4 · Organize & Analyze — reshape sheets, find anything, filter and sort."""
+"""Shortcuts 4: Organize & Analyze. Rows, columns, sheets, find and replace, filter and sort."""
 from ..checks import (ascending, column_hidden, count_is, descending, marker_gap, pairs_intact, sheet_exists,
                       sheets_more_than, visible_count, visible_label_count, visible_other_than)
 from ..model import Arena, Boss, Fixture, Item, Stage, World, column, do, find, merge, self_check, table
 from .datasets import ORDERS
 
-# ------------------------------------------------------------------------------------ S4-1 Construction Crew
+# ------------------------------------------------------------------------------------ S4-1 Rows and Columns
 SECRETS = ["open", "SECRET", "open", "open", "SECRET", "open", "open", "open"]
 LIST = ["KEEP", "KEEP", "DELETE ME", "DELETE ME", "DELETE ME", "KEEP", "KEEP", "KEEP", "KEEP", "KEEP"]
 ITEMS_1 = (
@@ -16,7 +16,7 @@ ITEMS_1 = (
          "Ctrl plus the minus key."),
     Item("S4.hide_rows", "shortcut", "Ctrl+9", "Hide the selected rows.", "Hidden rows keep their data.",
          "Which keys hide the selected rows?", ("Ctrl+9",), "Ctrl plus a number key."),
-    Item("S4.hide_cols", "shortcut", "Ctrl+0", "Hide the selected columns.", "Pair with Ctrl+Space to grab the column.",
+    Item("S4.hide_cols", "shortcut", "Ctrl+0", "Hide the selected columns.", "Select the column with Ctrl+Space first.",
          "Which keys hide the selected columns?", ("Ctrl+0",), "Ctrl plus zero."),
 )
 ARENA_1 = Arena(
@@ -48,45 +48,44 @@ MISSIONS_1 = (
        "Ctrl+Space, then Ctrl+0.", column_hidden("H5"), solve=[Fixture("hide_cols", "«@H5»")],
        wrong=[[Fixture("hide_cols", "«@G5»")]], items=("S4.hide_cols",), arena_cell="H5", f9=True),
 )
-STAGE_1 = Stage("S4-1", "Construction Crew", "insert, delete and hide rows and columns", ITEMS_1, MISSIONS_1, ARENA_1)
+STAGE_1 = Stage("S4-1", "Rows and Columns", ITEMS_1, MISSIONS_1, ARENA_1)
 
-# ------------------------------------------------------------------------------------ S4-2 Sheet Master
+# ------------------------------------------------------------------------------------ S4-2 Sheets and Files
 ITEMS_2 = (
     Item("S4.new_sheet", "shortcut", "Shift+F11", "Insert a new worksheet.", "Alt+Shift+F1 does the same.",
          "Which keys insert a new worksheet?", ("Shift+F11", "Alt+Shift+F1"), "Shift plus F11."),
     Item("S4.rename", "shortcut", "Alt+H, O, R", "Rename the current sheet (KeyTips: Home, Format, Rename).",
          "Type the new name, then Enter.", "Which KeyTips rename the current sheet?", ("Alt+H, O, R",),
          "Alt, H, O, R one after another."),
-    Item("S4.save", "shortcut", "Ctrl+S", "Save the workbook.", "Save early, save often.", "Which keys save the workbook?",
+    Item("S4.save", "shortcut", "Ctrl+S", "Save the workbook.", "Saves to the current file. F12 saves a copy instead.", "Which keys save the workbook?",
          ("Ctrl+S",), "S for Save."),
     Item("S4.save_as", "shortcut", "F12", "Open Save As to save a copy or change the name.",
          "Keep the original and practice on a copy.", "Which key opens Save As?", ("F12",), "The last function key."),
-    Item("S4.new_wb", "shortcut", "Ctrl+N", "Create a new blank workbook.", "Starts fresh in a new window.",
+    Item("S4.new_wb", "shortcut", "Ctrl+N", "Create a new blank workbook.", "The new workbook opens in its own window.",
          "Which keys create a new blank workbook?", ("Ctrl+N",), "N for New."),
     Item("S4.open", "shortcut", "Ctrl+O", "Open a workbook (and see your recent files).", "Recent files are listed first.",
          "Which keys open a workbook?", ("Ctrl+O",), "O for Open."),
-    Item("S4.close", "shortcut", "Ctrl+W", "Close the current workbook window.", "Excel asks before losing changes.",
+    Item("S4.close", "shortcut", "Ctrl+W", "Close the current workbook window.", "Excel asks before closing a file with unsaved changes.",
          "Which keys close the current workbook?", ("Ctrl+W",), "W for Window."),
-    Item("S4.print", "shortcut", "Ctrl+P", "Open Print (with a preview).", "Check the preview before paper.",
+    Item("S4.print", "shortcut", "Ctrl+P", "Open Print (with a preview).", "Check the preview before you print.",
          "Which keys open Print?", ("Ctrl+P",), "P for Print."),
 )
-ARENA_2 = Arena(cells={"B5": "Sheet tricks happen on the sheet tabs. The missions are on the stage sheet."},
+ARENA_2 = Arena(cells={"B5": "These missions work on the sheet tabs. Their checks are on the stage sheet."},
                 pass_code="TABS", labels=("B5",))
 MISSIONS_2 = (
     do("S4-2.M1", "Press Shift+F11 to insert a new worksheet, then come back here and press F9.", "Shift+F11.",
        sheets_more_than(), solve=[Fixture("add_sheet", "")], wrong=[[Fixture("type", "«@B7»", "x")]],
        items=("S4.new_sheet",), arena_cell="B5", f9=True),
-    do("S4-2.M2", "Go to the sheet named Rename Me (Ctrl+PgDn), press Alt, H, O, R, type Vault and press Enter. Come "
-                  "back and press F9.", "Home → Format → Rename.", sheet_exists("Vault"),
+    do("S4-2.M2", "Go to the sheet named Rename Me (press Ctrl+PgDn twice from this sheet), press Alt, H, O, R, type "
+                  "Vault and press Enter. Come back here and press F9.", "Home → Format → Rename.", sheet_exists("Vault"),
        solve=[Fixture("rename_sheet", "", ("Rename Me", "Vault"))],
        wrong=[[Fixture("rename_sheet", "", ("Rename Me", "Vaults"))]], items=("S4.rename",), arena_cell="B5", f9=True),
     self_check("S4-2.M3", "Save your progress with Ctrl+S (or keep the original and use F12 to save a copy). Then pick "
                           "Done.", "Ctrl+S or F12.", items=("S4.save", "S4.save_as")),
 )
-STAGE_2 = Stage("S4-2", "Sheet Master", "manage sheets and files from the keyboard", ITEMS_2, MISSIONS_2, ARENA_2,
-                extra_sheets=(("Rename Me", "Rename this sheet to Vault with Alt, H, O, R (mission on stage S4-2)."),))
+STAGE_2 = Stage("S4-2", "Sheets and Files", ITEMS_2, MISSIONS_2, ARENA_2, extra_sheets=("Rename Me",))
 
-# ------------------------------------------------------------------------------------ S4-3 Detective
+# ------------------------------------------------------------------------------------ S4-3 Find and Replace
 POOL = ["Apple", "Banana", "Cherry", "Gadget Pro", "Mini Gadget", "Widget", "Gizmo", "Kiwi", "Lemon", "Mango",
         "Gadget Max", "Nut Mix", "Olive", "Pear", "Quince"]
 TECH = {"Gadget Pro", "Mini Gadget", "Widget", "Gizmo", "Gadget Max"}
@@ -104,7 +103,7 @@ NA_COUNT = sum(r[4] == "N/A" for r in INVENTORY)
 ITEMS_3 = (
     Item("S4.find", "shortcut", "Ctrl+F", "Find text or numbers anywhere on the sheet.",
          "Find All lists every match and counts them.", "Which keys open Find?", ("Ctrl+F",), "F for Find."),
-    Item("S4.replace", "shortcut", "Ctrl+H", "Find and replace text or numbers.", "Replace All fixes every match at once.",
+    Item("S4.replace", "shortcut", "Ctrl+H", "Find and replace text or numbers.", "Replace All changes every match at once.",
          "Which keys open Find and Replace on the Replace tab?", ("Ctrl+H",), "The letter after G."),
 )
 ARENA_3 = Arena(cells=table("B5", ["SKU", "Product", "Category", "Stock", "Note"], INVENTORY),
@@ -122,9 +121,9 @@ MISSIONS_3 = (
                     "that number.", "The count is at the bottom of the Find window.", GADGETS, items=("S4.find",),
          wrong=(GADGETS + 1,), verify=("countif_contains", "Gadget")),
 )
-STAGE_3 = Stage("S4-3", "Detective", "find and fix anything in seconds", ITEMS_3, MISSIONS_3, ARENA_3)
+STAGE_3 = Stage("S4-3", "Find and Replace", ITEMS_3, MISSIONS_3, ARENA_3)
 
-# ------------------------------------------------------------------------------------ S4-4 Data Wrangler
+# ------------------------------------------------------------------------------------ S4-4 Filter, Sort, Table, Chart
 PLAYERS = [["Ann", 40, "Silver"], ["Bo", 90, "Gold"], ["Cy", 70, "Gold"], ["Di", 10, "Bronze"], ["Ed", 55, "Silver"],
            ["Flo", 85, "Gold"], ["Gil", 25, "Bronze"], ["Hu", 65, "Silver"], ["Ida", 95, "Gold"], ["Jay", 35, "Bronze"]]
 VISITS = [["Jan", 1200], ["Feb", 1350], ["Mar", 1600], ["Apr", 1500], ["May", 1800], ["Jun", 2100]]
@@ -144,8 +143,8 @@ ITEMS_4 = (
     Item("S4.sort_za", "shortcut", "Alt+A, S, D", "Sort Z→A / largest to smallest (KeyTips: Data, Sort).",
          "Whole rows move together, so records stay intact.", "Which KeyTips sort Z to A?", ("Alt+A, S, D",),
          "Alt, A, S, then D for descending."),
-    Item("S4.chart", "shortcut", "Alt+F1", "Drop an instant chart of the selected data on the sheet.",
-         "F11 puts the chart on its own sheet.", "Which keys insert an instant chart on the sheet?", ("Alt+F1",),
+    Item("S4.chart", "shortcut", "Alt+F1", "Insert a chart of the selected data on the current sheet.",
+         "F11 puts the chart on its own sheet.", "Which keys insert a chart of the selected data on the current sheet?", ("Alt+F1",),
          "Alt plus F1."),
 )
 ARENA_4 = Arena(
@@ -167,9 +166,9 @@ MISSIONS_4 = (
        solve=[Fixture("sort", "«@B30:D40»", "desc", ("C",))], wrong=[[Fixture("sort_column_only", "«@C31:C40»", "desc")]],
        items=("S4.sort_za",), arena_cell="C31"),
     self_check("S4-4.M3", "Click inside the table at B45 and press Ctrl+T, then Enter. Next select B45:C51 and press "
-                          "Alt+F1 to drop in a chart. Pick Done.", "Ctrl+T, then Alt+F1.", items=("S4.table", "S4.chart")),
+                          "Alt+F1 to insert a chart. Pick Done.", "Ctrl+T, then Alt+F1.", items=("S4.table", "S4.chart")),
 )
-STAGE_4 = Stage("S4-4", "Data Wrangler", "filter, sort, tabulate and chart", ITEMS_4, MISSIONS_4, ARENA_4)
+STAGE_4 = Stage("S4-4", "Filter, Sort, Table, Chart", ITEMS_4, MISSIONS_4, ARENA_4)
 
 # ------------------------------------------------------------------------------------ Boss
 SHUFFLED = [PLAYERS[i] for i in (8, 1, 6, 0, 9, 2, 7, 4, 5, 3)]
@@ -227,7 +226,7 @@ BOSS_MISSIONS = (
 
 WORLD = World(
     code="S4", track="S", order=7, title="Organize & Analyze",
-    tagline="Reshape sheets, find anything, filter and sort from the keyboard.",
+    tagline="Insert, hide, find, replace, filter and sort from the keyboard.",
     file_name="07 Shortcuts 4 - Organize and Analyze.xlsx",
     stages=(STAGE_1, STAGE_2, STAGE_3, STAGE_4),
     boss=Boss(BOSS_MISSIONS, BOSS_ARENA, par_minutes=12),

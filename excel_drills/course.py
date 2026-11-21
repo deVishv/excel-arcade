@@ -68,7 +68,7 @@ class Course:
         if normalize(item.display) in mine:              # the option itself answers the recall question
             prompt = "Pick " + item.prompt[5:] if item.prompt.startswith("Type ") else item.prompt
         else:                                            # e.g. "( ) first" can't answer "What does =2+3*4 return?"
-            prompt = f"Which move is this? {item.what}"
+            prompt = f"Which one matches this description? {item.what}"
         return Challenge(cid, "PICK", prompt, item.hint, Pick(choices, item.display),
                          solve=(Fixture("type", "«ans»", item.display),),
                          wrong=((Fixture("type", "«ans»", options[0]),),), items=(item_id,))

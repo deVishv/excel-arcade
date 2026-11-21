@@ -1,4 +1,4 @@
-"""Formulas 1 · Formula Basics — write your first formulas and make them fill down correctly."""
+"""Formulas 1: Formula Basics. Write your first formulas and make them fill down correctly."""
 from ..model import Arena, Boss, Formula, Item, Stage, World, column, filled, find, formula, merge, row, table
 from .datasets import xl_round
 
@@ -7,7 +7,7 @@ def _r(cell: str) -> int:
     return int("".join(ch for ch in cell if ch.isdigit()))
 
 
-# ------------------------------------------------------------------------------------ F1-1 Power Up
+# ------------------------------------------------------------------------------------ F1-1 First Formulas
 ITEMS_1 = (
     Item("F1.equals", "concept", "=", "Every formula starts with an equals sign.",
          "Without =, Excel stores what you typed as plain text.", "Which character must every formula start with?",
@@ -18,7 +18,7 @@ ITEMS_1 = (
     Item("F1.precedence", "concept", "( ) first", "Order: parentheses, then ^, then * and /, then + and -.",
          "=2+3*4 is 14, but =(2+3)*4 is 20.", "What does =2+3*4 return?", ("14",), "Multiply before you add."),
     Item("F1.cellref", "concept", "=B2*C2", "Point at cells instead of typing numbers.",
-         "Change B2 and the result updates by itself.", "Type the formula that multiplies cell B2 by cell C2.",
+         "Change B2 and the result updates.", "Type the formula that multiplies cell B2 by cell C2.",
          ("=B2*C2", "=C2*B2", "B2*C2", "C2*B2"), "Start with = then the two cell addresses."),
 )
 ARENA_1 = Arena(
@@ -38,12 +38,13 @@ MISSIONS_1 = (
             items=("F1.precedence",), wrong=("=C7+3*D7",)),
     formula("F1-1.M3", "In F8, raise the Qty of Tape (D8) to the power of 2 using ^.", "Type =D8^2.", "F8", "=D8^2",
             64, items=("F1.operators",), wrong=("=D8*2",), contains=("^",)),
-    find("F1-1.M4", "Work it out first, then test it in F9 if you like: what does =10-2*3 return? Type the number.",
+    find("F1-1.M4", "What does =10-2*3 return? Work it out, then check it in cell F9 of the arena if you like. "
+                    "Type the number.",
          "Multiply first: 2*3 = 6.", 4, items=("F1.precedence",), wrong=(24,)),
 )
-STAGE_1 = Stage("F1-1", "Power Up", "write formulas that calculate from cells", ITEMS_1, MISSIONS_1, ARENA_1)
+STAGE_1 = Stage("F1-1", "First Formulas", ITEMS_1, MISSIONS_1, ARENA_1)
 
-# ------------------------------------------------------------------------------------ F1-2 Big Six
+# ------------------------------------------------------------------------------------ F1-2 Core Functions
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 SALES = [420, 515, 380, 610, 450, 555, 700, 640, 480, 530, 690, 720]
 RETURNS = [3, 5, "n/a", 2, 4, 6, "n/a", 1, 0, 2, 3, 5]
@@ -53,7 +54,7 @@ ITEMS_2 = (
     Item("F1.average", "function", "AVERAGE", "The mean of the numbers in a range.",
          "Blank cells and text are skipped, not counted as 0.", "Which function returns the mean of a range?",
          ("AVERAGE",), "Starts with AVER."),
-    Item("F1.max", "function", "MAX", "The largest number in a range.", "Pair it with MIN to see the spread.",
+    Item("F1.max", "function", "MAX", "The largest number in a range.", "MAX minus MIN gives the spread of the data.",
          "Which function returns the largest number in a range?", ("MAX",), "Short for maximum."),
     Item("F1.min", "function", "MIN", "The smallest number in a range.", "Text such as n/a is ignored.",
          "Which function returns the smallest number in a range?", ("MIN",), "Short for minimum."),
@@ -61,7 +62,7 @@ ITEMS_2 = (
          "Text doesn't count: use COUNTA for any filled cell.", "Which function counts only the cells that hold numbers?",
          ("COUNT",), "The plain counting function."),
     Item("F1.counta", "function", "COUNTA", "Count the cells that are not empty (numbers, text, anything).",
-         "The A stands for 'all'.", "Which function counts every non-empty cell?", ("COUNTA",), "COUNT plus one letter."),
+         "Use it to count names, IDs or any other entries.", "Which function counts every non-empty cell?", ("COUNTA",), "COUNT plus one letter."),
     Item("F1.autosum", "shortcut", "Alt+=", "AutoSum: insert =SUM() over the numbers above or to the left.",
          "Select the cell under a column of numbers, press Alt+=, then Enter.", "Which keys insert an AutoSum formula?",
          ("Alt+=",), "Alt plus the equals key."),
@@ -93,9 +94,9 @@ MISSIONS_2 = (
             "G10", "=COUNTA(D6:D17)", len(RETURNS), items=("F1.counta",), wrong=("=COUNT(D6:D17)",),
             uses=("COUNTA",)),
 )
-STAGE_2 = Stage("F1-2", "Big Six", "summarize a column with six core functions", ITEMS_2, MISSIONS_2, ARENA_2)
+STAGE_2 = Stage("F1-2", "Core Functions", ITEMS_2, MISSIONS_2, ARENA_2)
 
-# ------------------------------------------------------------------------------------ F1-3 Anchors
+# ------------------------------------------------------------------------------------ F1-3 Absolute References
 TAX_PRICES = [20, 35, 12.5, 80, 46, 9.99, 150, 64]
 DISCOUNT_PRICES = [40, 25, 60, 15, 90]
 ITEMS_3 = (
@@ -103,7 +104,7 @@ ITEMS_3 = (
          "Use it for one fixed cell that every row needs, like a tax rate.",
          "Type the absolute version of the reference E6.", ("$E$6",), "Put $ before the column and the row."),
     Item("F1.mixed", "concept", "$A1 / A$1", "Mixed reference: lock only the column ($A1) or only the row (A$1).",
-         "Perfect for grids where one side stays fixed.", "Type a reference to C16 that locks only the row.",
+         "Use it in grids where one formula fills both down and across.", "Type a reference to C16 that locks only the row.",
          ("C$16",), "The $ goes right before 16."),
     Item("F1.f4", "shortcut", "F4", "While editing a reference, cycle A1 → $A$1 → A$1 → $A1.",
          "Click inside the reference in the formula, then tap F4.",
@@ -117,7 +118,7 @@ ARENA_3 = Arena(
     cells=merge(
         table("B5", ["Price", "Tax"], [[p, None] for p in TAX_PRICES]),
         {"E5": "Tax rate", "E6": 0.08},
-        {"B16": "Price ↓ · Discount →"}, row("C16", [0.1, 0.2, 0.3]), column("B17", DISCOUNT_PRICES),
+        {"B16": "Price ↓ / Discount →"}, row("C16", [0.1, 0.2, 0.3]), column("B17", DISCOUNT_PRICES),
     ),
     pass_code="ANCHOR", inputs=("C6:C13", "C17:C21"), headers=("B5:C5",), labels=("E5", "B16"),
     number_formats={"E6": "0%", "C16:E16": "0%"}, widths={"B": 20},
@@ -132,15 +133,15 @@ MISSIONS_3 = (
            lambda c: f"=$B{_r(c)}*(1-C$16)", [p * (1 - 0.1) for p in DISCOUNT_PRICES],
            items=("F1.mixed", "F1.ctrl_d"), wrong_for=lambda c: f"=B{_r(c)}*(1-C{_r(c) - 1})", dollar=True),
 )
-STAGE_3 = Stage("F1-3", "Anchors", "lock references so formulas fill correctly", ITEMS_3, MISSIONS_3, ARENA_3)
+STAGE_3 = Stage("F1-3", "Absolute References", ITEMS_3, MISSIONS_3, ARENA_3)
 
-# ------------------------------------------------------------------------------------ F1-4 Precision
+# ------------------------------------------------------------------------------------ F1-4 Rounding
 ITEMS_4 = (
     Item("F1.round", "function", "ROUND", "Round to a number of digits: =ROUND(3.14159,2) gives 3.14.",
          "Negative digits round to tens or hundreds: =ROUND(1234,-2) is 1200.",
          "Which function rounds a number to a chosen number of digits?", ("ROUND",), "The plain rounding function."),
     Item("F1.roundup", "function", "ROUNDUP", "Always round away from zero: =ROUNDUP(2.1,0) gives 3.",
-         "Good for 'how many boxes do I need?'", "Which function always rounds up, away from zero?", ("ROUNDUP",),
+         "Use it for counts that can't be partial, such as boxes needed.", "Which function always rounds up, away from zero?", ("ROUNDUP",),
          "ROUND plus a direction."),
     Item("F1.rounddown", "function", "ROUNDDOWN", "Always round toward zero: chop off the extra digits.",
          "=ROUNDDOWN(7.86,1) gives 7.8.", "Which function always rounds down, toward zero?", ("ROUNDDOWN",),
@@ -164,14 +165,14 @@ MISSIONS_4 = (
     formula("F1-4.M4", "In D9, round B9 to the nearest hundred with ROUND (use -2 digits).", "Negative digits.",
             "D9", "=ROUND(B9,-2)", 1200, items=("F1.round",), wrong=("=ROUND(B9,2)",), uses=("ROUND",)),
 )
-STAGE_4 = Stage("F1-4", "Precision", "round numbers exactly the way you want", ITEMS_4, MISSIONS_4, ARENA_4)
+STAGE_4 = Stage("F1-4", "Rounding", ITEMS_4, MISSIONS_4, ARENA_4)
 
-# ------------------------------------------------------------------------------------ F1-5 X-Ray
+# ------------------------------------------------------------------------------------ F1-5 Inspect Formulas
 POINTS_5 = {r: Formula(f"=B{r}*10+5", (r - 5) * 10 + 5) for r in range(6, 16)}
 POINTS_5[12] = 75                                       # the one typed-over cell (same value as its formula)
 ITEMS_5 = (
     Item("F1.show_formulas", "shortcut", "Ctrl+`", "Show formulas instead of results; press again to switch back.",
-         "The ` key sits left of 1. Great for spotting typed-over formulas.",
+         "The ` key is left of 1. Use it to spot numbers typed over formulas.",
          "Which keys switch between showing results and showing formulas?",
          ("Ctrl+`", "Ctrl+Grave", "Ctrl+Grave accent", "Ctrl+Backtick"), "Ctrl plus the key left of 1."),
     Item("F1.f2", "shortcut", "F2", "Edit the active cell; its references light up in color.",
@@ -215,7 +216,7 @@ MISSIONS_5 = (
             "number = E6/7, num_digits = 1.", "G9", "=ROUND(E6/7,1)", 92.9, items=("F1.ctrl_shift_a",),
             wrong=("=E6/7",), uses=("ROUND",)),
 )
-STAGE_5 = Stage("F1-5", "X-Ray", "see inside formulas and write them faster", ITEMS_5, MISSIONS_5, ARENA_5)
+STAGE_5 = Stage("F1-5", "Inspect Formulas", ITEMS_5, MISSIONS_5, ARENA_5)
 
 # ------------------------------------------------------------------------------------ Boss
 SHOP = [["Lamp", 12, 30, 5, 4], ["Mug", 3, 9, 20, 5], ["Desk", 85, 160, 2, "TBD"], ["Chair", 40, 95, 4, 3],

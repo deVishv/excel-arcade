@@ -1,15 +1,20 @@
-"""Formulas 7 · Dynamic Arrays — one formula, many results: SEQUENCE, FILTER, SORT, UNIQUE and LET."""
+"""Formulas 7: Dynamic Arrays. One formula, many results: SEQUENCE, FILTER, SORT, UNIQUE and LET."""
 from statistics import mean
 
 from ..model import Arena, Boss, Fixture, Formula, Item, Stage, World, do, formula, merge, spill, table
 from .datasets import ORDER_HEADER, ORDERS, orders_rows, serial
 
 
-def orders_arena(pass_code: str, extra: dict, inputs: tuple, *, headers: tuple = (), labels: tuple = ()) -> Arena:
-    """ORDERS in B5:H25 (rows 6..25). Answer areas start in column K."""
+def orders_arena(pass_code: str, extra: dict, inputs: tuple, *, headers: tuple = (), labels: tuple = (),
+                 spilled_dates: str | None = None) -> Arena:
+    """ORDERS in B5:H25 (rows 6..25). Answer areas start in column K.
+
+    `spilled_dates` pre-formats the cells a FILTER of whole rows spills its Date column into,
+    so the dates don't show as serial numbers.
+    """
+    dates = {"C6:C25": "d-mmm-yy", **({spilled_dates: "d-mmm-yy"} if spilled_dates else {})}
     return Arena(cells=merge(table("B5", ORDER_HEADER, orders_rows()), extra), pass_code=pass_code, inputs=inputs,
-                 headers=("B5:H5", *headers), labels=labels, number_formats={"C6:C25": "d-mmm-yy"},
-                 widths={"C": 11})
+                 headers=("B5:H5", *headers), labels=labels, number_formats=dates, widths={"C": 11})
 
 
 def row_values(o) -> list:
@@ -18,11 +23,11 @@ def row_values(o) -> list:
 
 EAST = [o for o in ORDERS if o.region == "East"]
 
-# ------------------------------------------------------------------------------------ F7-1 Spill Zone
+# ------------------------------------------------------------------------------------ F7-1 Spill Basics
 ITEMS_1 = (
     Item("F7.spill", "concept", "spill", "One formula can return many values; they spill into the cells around it.",
          "Edit only the top-left cell; the rest follow.", "What is it called when one formula's results flow into "
-         "neighboring cells?", ("spill", "spilling", "spills"), "Like water spilling over."),
+         "neighboring cells?", ("spill", "spilling", "spills"), "Five letters."),
     Item("F7.spill_error", "concept", "#SPILL!", "#SPILL! means something is in the way of the results.",
          "Clear the blocking cells and the results appear.", "Which error appears when a spill range is blocked?",
          ("#SPILL!", "SPILL", "#SPILL"), "#SPILL! with an exclamation mark."),
@@ -39,23 +44,23 @@ ARENA_1 = orders_arena(
      "M8": "BLOCK", "O5": "Ready-made spill", "O6": Formula("=SEQUENCE(4,1,10,10)", 10), "K19": "Sum of O6#"},
     ("K6", "K20"), headers=("K5", "M5", "O5"), labels=("K19", "M8"))
 MISSIONS_1 = (
-    spill("F7-1.M1", "In K6 type =SEQUENCE(10) and press Enter. One formula fills K6:K15.", "Just one cell to type in.",
+    spill("F7-1.M1", "In K6 type =SEQUENCE(10) and press Enter. One formula fills K6:K15.", "Type in K6 only.",
           "K6", "=SEQUENCE(10)", [[i] for i in range(1, 11)], items=("F7.sequence", "F7.spill"),
           wrong=("=SEQUENCE(9)",), uses=("SEQUENCE",)),
-    do("F7-1.M2", "M6 shows #SPILL! because M8 is in its way. Click M8 and press Delete: five numbers spill into place.",
+    do("F7-1.M2", "M6 shows #SPILL! because M8 is in its way. Click M8 and press Delete; the five numbers then spill.",
        "Clear the blocking cell.", "AND(ISFORMULA(«@M6»),ROWS(ANCHORARRAY(«@M6»))=5)",   # M8 holds a spilled 3 once solved
        solve=[Fixture("clear", "«@M8»")], wrong=[[Fixture("type", "«@M8»", "STILL HERE")]],
        items=("F7.spill_error",), arena_cell="M8"),
     formula("F7-1.M3", "O6 spills four numbers. In K20 add up the whole spill with =SUM(O6#).", "# = the whole spill.",
             "K20", "=SUM(O6#)", 100, items=("F7.spill_ref",), wrong=("=SUM(O6)",), contains=("#",)),
 )
-STAGE_1 = Stage("F7-1", "Spill Zone", "let one formula fill many cells", ITEMS_1, MISSIONS_1, ARENA_1)
+STAGE_1 = Stage("F7-1", "Spill Basics", ITEMS_1, MISSIONS_1, ARENA_1)
 
-# ------------------------------------------------------------------------------------ F7-2 Sifter
+# ------------------------------------------------------------------------------------ F7-2 FILTER
 ITEMS_2 = (
     Item("F7.filter", "function", "FILTER", "FILTER(range, condition) spills only the matching rows.",
          '=FILTER(B6:H25,D6:D25="East")', "Which function returns only the rows that meet a condition?",
-         ("FILTER",), "Like a coffee filter."),
+         ("FILTER",), "Six letters."),
     Item("F7.filter_and", "concept", "(…)*(…)", "Multiply conditions for AND; add them for OR.",
          '(D6:D25="East")*(G6:G25>40) keeps rows that pass both.', "In FILTER, which operator joins two conditions "
          "so BOTH must be true?", ("*", "asterisk"), "Multiply."),
@@ -64,7 +69,7 @@ ITEMS_2 = (
          "matches?", ("3", "3rd", "third", "if_empty"), "After array and include."),
 )
 ARENA_2 = orders_arena("SIFTER", {"K5": "East orders ▼", "K19": "Big East orders ▼", "K29": "Central orders ▼"},
-                       ("K6", "K20", "K30"), headers=("K5", "K19", "K29"))
+                       ("K6", "K20", "K30"), headers=("K5", "K19", "K29"), spilled_dates=f"L6:L{5 + len(EAST)}")
 MISSIONS_2 = (
     spill("F7-2.M1", 'In K6 spill every East order (all columns): =FILTER(B6:H25,D6:D25="East").', "One formula.",
           "K6", '=FILTER(B6:H25,D6:D25="East")', [row_values(o) for o in EAST], items=("F7.filter",),
@@ -77,9 +82,9 @@ MISSIONS_2 = (
                        "nothing matches.", "Third argument.", "K30", '=FILTER(B6:B25,D6:D25="Central","None")', "None",
             items=("F7.if_empty",), wrong=('=FILTER(B6:B25,D6:D25="Central")',), uses=("FILTER",)),
 )
-STAGE_2 = Stage("F7-2", "Sifter", "pull out exactly the rows you need", ITEMS_2, MISSIONS_2, ARENA_2)
+STAGE_2 = Stage("F7-2", "FILTER", ITEMS_2, MISSIONS_2, ARENA_2)
 
-# ------------------------------------------------------------------------------------ F7-3 Sorter
+# ------------------------------------------------------------------------------------ F7-3 SORT and UNIQUE
 ITEMS_3 = (
     Item("F7.sort", "function", "SORT", "SORT(range, column, order) spills a sorted copy; -1 = largest first.",
          "The original data never moves.", "Which function spills a sorted copy of a range?", ("SORT",),
@@ -89,7 +94,7 @@ ITEMS_3 = (
          ("SORTBY",), "SORT plus BY."),
     Item("F7.unique", "function", "UNIQUE", "UNIQUE(range) spills each different value once.",
          "Wrap in COUNTA to count the distinct values.", "Which function returns each distinct value once?",
-         ("UNIQUE",), "One of a kind."),
+         ("UNIQUE",), "Six letters."),
 )
 ARENA_3 = orders_arena("SORTER", {"K5": "Revenue, big → small", "M5": "IDs, newest first", "O5": "Regions",
                                   "Q5": "How many reps?"}, ("K6", "M6", "O6", "Q6"), headers=("K5", "M5", "O5", "Q5"))
@@ -108,9 +113,9 @@ MISSIONS_3 = (
             "=COUNTA(UNIQUE(E6:E25))", len({o.rep for o in ORDERS}), items=("F7.unique",),
             wrong=("=COUNTA(E6:E25)",), uses=("COUNTA", "UNIQUE")),
 )
-STAGE_3 = Stage("F7-3", "Sorter", "sort and de-duplicate with one formula", ITEMS_3, MISSIONS_3, ARENA_3)
+STAGE_3 = Stage("F7-3", "SORT and UNIQUE", ITEMS_3, MISSIONS_3, ARENA_3)
 
-# ------------------------------------------------------------------------------------ F7-4 Combo
+# ------------------------------------------------------------------------------------ F7-4 Nesting and LET
 ITEMS_4 = (
     Item("F7.let", "function", "LET", "LET(name, value, calculation) names a value so you write it once.",
          "=LET(rev,H6:H25,SUM(rev)/COUNT(rev))", "Which function lets you name a value inside a formula?", ("LET",),
@@ -141,18 +146,19 @@ MISSIONS_4 = (
             "# = the whole spill.", "K30", "=ROWS(Q6#)", len({o.region for o in ORDERS}), items=("F7.spill_ref",),
             wrong=("=ROWS(Q6)",), contains=("#",)),
 )
-STAGE_4 = Stage("F7-4", "Combo", "nest dynamic functions and name values with LET", ITEMS_4, MISSIONS_4, ARENA_4)
+STAGE_4 = Stage("F7-4", "Nesting and LET", ITEMS_4, MISSIONS_4, ARENA_4)
 
 # ------------------------------------------------------------------------------------ Boss
 WEST = [o for o in ORDERS if o.region == "West"]
 BOSS_ARENA = orders_arena(
     "ARRAYMANCER",
     # The West FILTER spills 7 columns wide (M6:S10), so the ready-made spill lives in column U.
-    {"K5": "SEQUENCE(5)", "M5": "West orders", "K13": "Kim's IDs", "K29": "Units, big → small", "M29": "Products",
+    {"K5": "1 to 5", "M5": "West orders", "K13": "Kim's IDs", "K29": "Units, big → small", "M29": "Products",
      "O29": "How many products?", "Q29": "Reps, A→Z", "U5": "Ready-made", "U6": Formula("=SEQUENCE(3,1,5,5)", 5),
      "U12": "Sum of U6#", "W5": "IDs, newest first", "W29": "Central orders"},
     ("K6", "M6", "K14", "K30", "M30", "O30", "Q30", "U13", "W6", "W30"),
-    headers=("K5", "M5", "K13", "K29", "M29", "O29", "Q29", "U5", "W5", "W29"), labels=("U12",))
+    headers=("K5", "M5", "K13", "K29", "M29", "O29", "Q29", "U5", "W5", "W29"), labels=("U12",),
+    spilled_dates=f"N6:N{5 + len(WEST)}")
 BOSS_MISSIONS = (
     spill("F7-B.M1", "In K6 spill the numbers 1 to 5.", "SEQUENCE.", "K6", "=SEQUENCE(5)", [[i] for i in range(1, 6)],
           items=("F7.sequence",), wrong=("=SEQUENCE(4)",), uses=("SEQUENCE",)),

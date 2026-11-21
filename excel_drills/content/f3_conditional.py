@@ -1,4 +1,4 @@
-"""Formulas 3 · Conditional Math — count, add and average only the rows that match."""
+"""Formulas 3: Conditional Math. Count, add and average only the rows that match."""
 import datetime as dt
 from statistics import mean
 
@@ -22,7 +22,7 @@ def east(o):
     return o.region == "East"
 
 
-# ------------------------------------------------------------------------------------ F3-1 Counters
+# ------------------------------------------------------------------------------------ F3-1 COUNTIF
 ITEMS_1 = (
     Item("F3.countif", "function", "COUNTIF", "Count the cells that meet one condition.",
          '=COUNTIF(D6:D25,"East") counts the East rows.', "Which function counts cells that meet one condition?",
@@ -31,7 +31,7 @@ ITEMS_1 = (
          "The operator goes inside the quotes with the value.", 'Type the COUNTIF criteria for "greater than 50", '
          "quotes included.", ('">50"',), "Quotes around >50."),
     Item("F3.wildcards", "concept", "* and ?", '* matches any text, ? one character: "G*" = starts with G.',
-         'Wildcards work in COUNTIF, SUMIF and their IFS cousins.', "Which wildcard matches any number of characters?",
+         'Wildcards work in COUNTIF, SUMIF, AVERAGEIF and their IFS versions.', "Which wildcard matches any number of characters?",
          ("*", "asterisk"), "Shift+8."),
 )
 ARENA_1 = orders_arena("COUNTER", {"L6": "East orders", "L7": "Orders over 50 units", "L8": "Products starting with G",
@@ -50,9 +50,9 @@ MISSIONS_1 = (
             '=COUNTIF(D6:D25,"<>East")', sum(not east(o) for o in ORDERS), items=("F3.criteria_ops",),
             wrong=('=COUNTIF(D6:D25,"East")',), uses=(("COUNTIF", "COUNTIFS"),), contains=("<>",)),
 )
-STAGE_1 = Stage("F3-1", "Counters", "count only the rows you care about", ITEMS_1, MISSIONS_1, ARENA_1)
+STAGE_1 = Stage("F3-1", "COUNTIF", ITEMS_1, MISSIONS_1, ARENA_1)
 
-# ------------------------------------------------------------------------------------ F3-2 Money Bags
+# ------------------------------------------------------------------------------------ F3-2 SUMIF and AVERAGEIF
 ITEMS_2 = (
     Item("F3.sumif", "function", "SUMIF", "Add the values whose row meets one condition.",
          '=SUMIF(D6:D25,"West",H6:H25): test range, criteria, then sum range.',
@@ -75,9 +75,9 @@ MISSIONS_2 = (
             '=SUMIF(G6:G25,">=40",H6:H25)', sum(o.revenue for o in ORDERS if o.units >= 40),
             items=("F3.sumif", "F3.criteria_ops"), wrong=('=SUMIF(G6:G25,">40",H6:H25)',), uses=(("SUMIF", "SUMIFS"),)),
 )
-STAGE_2 = Stage("F3-2", "Money Bags", "add and average with a condition", ITEMS_2, MISSIONS_2, ARENA_2)
+STAGE_2 = Stage("F3-2", "SUMIF and AVERAGEIF", ITEMS_2, MISSIONS_2, ARENA_2)
 
-# ------------------------------------------------------------------------------------ F3-3 Multi-Filter
+# ------------------------------------------------------------------------------------ F3-3 Multiple Conditions
 ITEMS_3 = (
     Item("F3.countifs", "function", "COUNTIFS", "Count rows that meet several conditions at once.",
          "Pairs of range + criteria; every pair must match.", "Which function counts rows that meet several "
@@ -104,9 +104,9 @@ MISSIONS_3 = (
             mean(o.revenue for o in ORDERS if o.rep == "Kim" and east(o)), items=("F3.averageifs",),
             wrong=('=AVERAGEIFS(H6:H25,E6:E25,"Kim")',), uses=("AVERAGEIFS",)),
 )
-STAGE_3 = Stage("F3-3", "Multi-Filter", "stack several conditions", ITEMS_3, MISSIONS_3, ARENA_3)
+STAGE_3 = Stage("F3-3", "Multiple Conditions", ITEMS_3, MISSIONS_3, ARENA_3)
 
-# ------------------------------------------------------------------------------------ F3-4 Extremes
+# ------------------------------------------------------------------------------------ F3-4 Min, Max and Date Ranges
 ITEMS_4 = (
     Item("F3.maxifs", "function", "MAXIFS", "The largest value whose row meets your conditions.",
          "Max range first, then range/criteria pairs.", "Which function returns the largest value that meets "
@@ -139,7 +139,7 @@ MISSIONS_4 = (
             sum(o.revenue for o in ORDERS if START <= o.date <= END), items=("F3.date_range", "F3.sumifs"),
             wrong=('=SUMIFS(H6:H25,C6:C25,">="&K9)',), uses=("SUMIFS",), contains=("&",)),
 )
-STAGE_4 = Stage("F3-4", "Extremes", "find highs, lows and date windows", ITEMS_4, MISSIONS_4, ARENA_4)
+STAGE_4 = Stage("F3-4", "Min, Max and Date Ranges", ITEMS_4, MISSIONS_4, ARENA_4)
 
 # ------------------------------------------------------------------------------------ Boss
 BOSS_ARENA = orders_arena("CONDOR", {"L6": "North orders", "L7": "Gadget revenue", "L8": "Lee's average units",

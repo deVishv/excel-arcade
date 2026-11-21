@@ -1,4 +1,4 @@
-"""Final Boss · The Championship — three rounds that mix every world in the course."""
+"""Final Boss: three rounds that mix every world in the course."""
 import dataclasses
 from statistics import mean
 
@@ -21,7 +21,7 @@ def after(prep: tuple, ch: Challenge) -> Challenge:
     return dataclasses.replace(ch, solve=prep + ch.solve, wrong=tuple(prep + w for w in ch.wrong))
 
 
-# ------------------------------------------------------------------------------------ R1 Shortcut Gauntlet
+# ------------------------------------------------------------------------------------ R1 Shortcuts
 R1_ARENA = Arena(
     cells=merge(
         {"B5": "TRAIL ▼"}, column("B6", list(range(1, 801))), {"B806": "CHAMPION"},
@@ -37,7 +37,7 @@ R1_ARENA = Arena(
 R1_MISSIONS = (
     find("R1.M1", "In the R1 Arena click B6 and press Ctrl+↓. Type the word at the end of the trail.", "One press.",
          "CHAMPION", items=("S1.ctrl_arrow",), wrong=("TRAIL",), verify=("end", "B6", "down")),
-    find("R1.M2", "Click D6 and keep pressing Ctrl+↓ until you reach a word. Type it.", "Jump the gaps.", "LEGEND",
+    find("R1.M2", "Click D6 and keep pressing Ctrl+↓ until you reach a word. Type it.", "Keep pressing to cross the gaps.", "LEGEND",
          items=("S1.ctrl_arrow",), wrong=("SCATTER",), verify=("end_chain", "D6", "down", 4)),
     find("R1.M3", "Press F5 (or Ctrl+G) and go to H500. Type the word there.", "Go To.", "VICTORY",
          items=("S1.goto",), wrong=("LEGEND",), verify=("value_at", "H500")),
@@ -46,9 +46,9 @@ R1_MISSIONS = (
     do("R1.M5", "Select F6:F12, type GO and press Ctrl+Enter.", "Ctrl+Enter fills the selection.",
        all_equal(cells_in("F6:F12"), "GO"), solve=[Fixture("type", "«@F6:F12»", "GO")],
        wrong=[[Fixture("type", "«@F6»", "GO")]], items=("S2.ctrl_enter",), arena_cell="F6"),
-    do("R1.M6", "In F15 type Excel, press Alt+Enter, type Arcade, then press Enter.", "Alt+Enter.",
-       line_break("F15", "Excel", "Arcade"), solve=[Fixture("linebreak", "«@F15»", ("Excel", "Arcade"))],
-       wrong=[[Fixture("type", "«@F15»", "Excel Arcade")]], items=("S2.alt_enter",), arena_cell="F15"),
+    do("R1.M6", "In F15 type Excel, press Alt+Enter, type Drills, then press Enter.", "Alt+Enter.",
+       line_break("F15", "Excel", "Drills"), solve=[Fixture("linebreak", "«@F15»", ("Excel", "Drills"))],
+       wrong=[[Fixture("type", "«@F15»", "Excel Drills")]], items=("S2.alt_enter",), arena_cell="F15"),
     do("R1.M7", "Stamp today's date in F17 with Ctrl+;, then Enter.", "Ctrl+;", today_constant("F17"),
        solve=[Fixture("today", "«@F17»")], wrong=[[Fixture("formula", "«@F17»", "=TODAY()")]], items=("S2.date",),
        arena_cell="F17", volatile=True),
@@ -63,10 +63,9 @@ R1_MISSIONS = (
        wrong=[[Fixture("autofilter", "«@B810:E830»", "South", (2,))]], items=("S4.filter", "S4.filter_menu"),
        arena_cell="C810"),
 )
-R1 = FinalRound("R1", "Shortcut Gauntlet", "prove every shortcut is in your fingers", ("shortcut",), R1_MISSIONS,
-                R1_ARENA)
+R1 = FinalRound("R1", "Shortcuts", ("shortcut",), R1_MISSIONS, R1_ARENA)
 
-# ------------------------------------------------------------------------------------ R2 Formula Gauntlet
+# ------------------------------------------------------------------------------------ R2 Formulas
 REGIONS = [["East", "Mia"], ["West", "Noah"], ["North", "Zoe"], ["South", "Liam"]]
 LATEST = max(o.date for o in ORDERS)
 R2_ARENA = Arena(
@@ -110,10 +109,9 @@ R2_MISSIONS = (
           '=FILTER(B6:B25,E6:E25="Raj")', [[o.id] for o in ORDERS if o.rep == "Raj"], items=("F7.filter",),
           wrong=('=FILTER(B6:B25,E6:E25="Kim")',), uses=("FILTER",)),
 )
-R2 = FinalRound("R2", "Formula Gauntlet", "answer real questions with the right formula", ("function", "concept"),
-                R2_MISSIONS, R2_ARENA)
+R2 = FinalRound("R2", "Formulas", ("function", "concept"), R2_MISSIONS, R2_ARENA)
 
-# ------------------------------------------------------------------------------------ R3 Real-World Mission
+# ------------------------------------------------------------------------------------ R3 Clean and Report
 RAW = [["  ada  LOVELACE", "E", "1,250"], ["grace HOPPER ", "W", "980"], ["alan turing", "N", "2,400"],
        ["  KATHERINE johnson", "S", "760"], ["tim berners-lee", "E", "1,100"], ["MARGARET hamilton", "W", "3,050"],
        ["linus torvalds ", "N", "640"], ["hedy LAMARR", "E", "1,875"], ["annie easley", "S", "2,200"],
@@ -180,12 +178,12 @@ R3_MISSIONS = (
         items=("F7.nesting",), wrong=("=UNIQUE(G6:G17)",), uses=(("SORT", "SORTBY"), "UNIQUE"),
         key="=SORT(UNIQUE(XLOOKUP(C6:C17,K6:K9,L6:L9)))")),
     after(R3_M2.solve, do(
-        "R3.M7", "Dress the Amount column F6:F17 as currency with Ctrl+Shift+$. Press F9.", "Ctrl+Shift+4.",
+        "R3.M7", "Format the Amount column F6:F17 as currency with Ctrl+Shift+$. Press F9.", "Ctrl+Shift+4.",
         format_in(cells_in("F6:F17"), CURRENCY), solve=[Fixture("number_format", "«@F6:F17»", "$#,##0.00_);($#,##0.00)")],
         wrong=[[Fixture("number_format", "«@F6:F17»", "0.00")]], items=("S3.currency",), arena_cell="F6", f9=True)),
     self_check("R3.M8", "Click inside the table at B5 and press Ctrl+T, then Enter: your cleaned data becomes an Excel "
                         "Table. Pick Done.", "Ctrl+T.", items=("S4.table",)),
 )
-R3 = FinalRound("R3", "Real-World Mission", "clean a messy export and report on it", (), R3_MISSIONS, R3_ARENA)
+R3 = FinalRound("R3", "Clean and Report", (), R3_MISSIONS, R3_ARENA)
 
-FINAL = FinalBoss(file_name="12 Final Boss - Championship.xlsx", rounds=(R1, R2, R3), par_minutes=45)
+FINAL = FinalBoss(file_name="12 Final Boss.xlsx", rounds=(R1, R2, R3), par_minutes=45)

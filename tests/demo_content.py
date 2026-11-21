@@ -148,9 +148,8 @@ BOSS = Boss(missions=(
 DEMO = World(
     code="D1", track="S", order=0, title="Demo", tagline="Framework acceptance world.", file_name="Demo.xlsx",
     stages=(
-        Stage("D1-1", "Alpha", "exercise every value check", ITEMS[:4], ALPHA_MISSIONS, ALPHA_ARENA),
-        Stage("D1-2", "Beta", "exercise every sheet drill", ITEMS[4:], BETA_MISSIONS, BETA_ARENA,
-              extra_sheets=(("Rename Me", "Rename this sheet to Vault (mission D1-2)."),)),
+        Stage("D1-1", "Alpha", ITEMS[:4], ALPHA_MISSIONS, ALPHA_ARENA),
+        Stage("D1-2", "Beta", ITEMS[4:], BETA_MISSIONS, BETA_ARENA, extra_sheets=("Rename Me",)),
     ),
     boss=BOSS,
 )

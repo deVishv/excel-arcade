@@ -34,13 +34,27 @@ def built(tmp_path_factory):
     return _built(tmp_path_factory)
 
 
-def test_visible_sheets_have_title_and_purpose_and_no_merges(built):
+def test_visible_sheets_have_a_title_no_subtitle_and_no_merges(built):
     for b in built:
         wb = openpyxl.load_workbook(b.path)
         for ws in wb.worksheets:
             assert not ws.merged_cells.ranges, f"{b.path.name}/{ws.title} has merged cells"
             if ws.sheet_state == "visible":
-                assert ws["A1"].value and ws["A2"].value, f"{b.path.name}/{ws.title} lacks A1/A2"
+                assert ws["A1"].value, f"{b.path.name}/{ws.title} lacks a title"
+                assert ws["A2"].value is None, f"{b.path.name}/{ws.title} has a subtitle in A2"
+
+
+DOTS = ("·", "•", "∙", "⋅")    # interpunct, bullet, bullet operator, dot operator
+
+
+def test_no_interpunct_anywhere_in_the_files(built):
+    """Checks every XML part (cells, formulas, cached values, validations, document properties)."""
+    for b in built:
+        with zipfile.ZipFile(b.path) as z:
+            for name in z.namelist():
+                text = z.read(name).decode("utf-8", "replace")
+                found = [d for d in DOTS if d in text]
+                assert not found, f"{b.path.name}/{name} contains {found}"
 
 
 def test_fonts_are_at_least_11pt(built):

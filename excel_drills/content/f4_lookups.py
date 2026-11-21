@@ -1,4 +1,4 @@
-"""Formulas 4 · Lookups — find a value in one column and bring back its partner from another."""
+"""Formulas 4: Lookups. Find a value in one column and return its partner from another."""
 from ..model import Arena, Boss, Item, Stage, World, column, filled, formula, merge, spill, table
 from .datasets import PRODUCT_HEADER, PRODUCTS, products_rows
 
@@ -28,7 +28,7 @@ def products_arena(pass_code: str, extra: dict, inputs: tuple, *, headers: tuple
                  widths={"C": 13, "I": 14, "J": 14})
 
 
-# ------------------------------------------------------------------------------------ F4-1 Seeker
+# ------------------------------------------------------------------------------------ F4-1 XLOOKUP
 ORDER_IDS = ["P-03", "P-11", "P-01", "P-14"]
 ITEMS_1 = (
     Item("F4.xlookup", "function", "XLOOKUP", "XLOOKUP(lookup_value, lookup_array, return_array) finds a match and "
@@ -36,7 +36,7 @@ ITEMS_1 = (
          "value and returns the matching item from another column?", ("XLOOKUP",), "X plus LOOKUP."),
     Item("F4.lock_ranges", "concept", "$B$6:$B$20", "Lock lookup ranges with $ before you fill the formula down.",
          "Otherwise the ranges slide down and miss rows.", "Which symbol locks a range so it doesn't shift when "
-         "you fill down?", ("$", "dollar", "dollar sign"), "The F4 symbol."),
+         "you fill down?", ("$", "dollar", "dollar sign"), "The symbol F4 adds."),
 )
 ARENA_1 = products_arena("SEEKER", merge({"I5": "Find ID", "I6": "P-07", "J5": "Price"}, {"I9": "Order IDs", "J9": "Stock"},
                                          column("I10", ORDER_IDS)), ("J6", "J10:J13"), headers=("I5:J5", "I9:J9"))
@@ -51,15 +51,15 @@ MISSIONS_1 = (
            wrong_for=lambda c: f"=XLOOKUP(I{_r(c)},B{_r(c) - 4}:B{_r(c) + 10},F{_r(c) - 4}:F{_r(c) + 10})",
            uses=("XLOOKUP",), dollar=True),
 )
-STAGE_1 = Stage("F4-1", "Seeker", "look up a value and bring back its partner", ITEMS_1, MISSIONS_1, ARENA_1)
+STAGE_1 = Stage("F4-1", "XLOOKUP", ITEMS_1, MISSIONS_1, ARENA_1)
 
-# ------------------------------------------------------------------------------------ F4-2 Safety Net
+# ------------------------------------------------------------------------------------ F4-2 XLOOKUP Options
 ITEMS_2 = (
     Item("F4.if_not_found", "concept", "if_not_found", "XLOOKUP's 4th argument: what to show when nothing matches.",
          '=XLOOKUP(A2,B:B,C:C,"Not found") instead of #N/A.', "Which XLOOKUP argument number sets the result when "
          "no match is found?", ("4", "4th", "fourth", "if_not_found"), "After lookup, lookup array, return array."),
     Item("F4.multi_return", "concept", "return 2+ columns", "Give XLOOKUP a return range two columns wide and both "
-         "values spill out.", "One formula, several answers side by side.", "If the return array is E6:F20, how many "
+         "values spill out.", "One formula returns several fields side by side.", "If the return array is E6:F20, how many "
          "columns does the result spill into?", ("2", "two"), "Count E and F."),
 )
 ARENA_2 = products_arena("SAFETYNET", {"I5": "Find ID", "I6": "P-99", "J5": "Product", "I8": "Find ID", "I9": "P-05",
@@ -73,12 +73,12 @@ MISSIONS_2 = (
           [[BY_ID["P-05"].price, BY_ID["P-05"].stock]], items=("F4.multi_return",),
           wrong=("=XLOOKUP(I9,B6:B20,E6:E20)",), uses=("XLOOKUP",)),
 )
-STAGE_2 = Stage("F4-2", "Safety Net", "handle missing values and return several columns", ITEMS_2, MISSIONS_2, ARENA_2)
+STAGE_2 = Stage("F4-2", "XLOOKUP Options", ITEMS_2, MISSIONS_2, ARENA_2)
 
-# ------------------------------------------------------------------------------------ F4-3 Old School
+# ------------------------------------------------------------------------------------ F4-3 VLOOKUP
 ITEMS_3 = (
     Item("F4.vlookup", "function", "VLOOKUP", "VLOOKUP(value, table, column_number, FALSE) searches the FIRST "
-         "column of a table.", "Still everywhere in older files.", "Which classic function searches the first column "
+         "column of a table.", "Common in older workbooks, so you need to be able to read it.", "Which classic function searches the first column "
          "of a table and returns a column by number?", ("VLOOKUP",), "V for vertical."),
     Item("F4.vlookup_false", "concept", "FALSE = exact", "End VLOOKUP with FALSE for an exact match.",
          "Forget it and VLOOKUP may return a wrong neighbor.", "Which 4th argument makes VLOOKUP find an exact match?",
@@ -95,16 +95,16 @@ MISSIONS_3 = (
             "J9", "=VLOOKUP(I9,B6:F20,5,FALSE)", BY_ID["P-04"].stock, items=("F4.vlookup",),
             wrong=("=VLOOKUP(I9,B6:F20,4,FALSE)",), uses=("VLOOKUP",)),
 )
-STAGE_3 = Stage("F4-3", "Old School", "read and write classic VLOOKUP", ITEMS_3, MISSIONS_3, ARENA_3)
+STAGE_3 = Stage("F4-3", "VLOOKUP", ITEMS_3, MISSIONS_3, ARENA_3)
 
-# ------------------------------------------------------------------------------------ F4-4 Power Couple
+# ------------------------------------------------------------------------------------ F4-4 INDEX and MATCH
 ITEMS_4 = (
     Item("F4.index", "function", "INDEX", "INDEX(range, n) returns the n-th item of a range.",
          "=INDEX(E6:E20,5) is the 5th price.", "Which function returns the item at a given position in a range?",
-         ("INDEX",), "Like a book's index."),
+         ("INDEX",), "Five letters."),
     Item("F4.match", "function", "MATCH", "MATCH(value, range, 0) returns the position of a value.",
          "The 0 means exact match.", "Which function returns the position of a value in a range?", ("MATCH",),
-         "It finds a match."),
+         "Five letters."),
     Item("F4.index_match", "concept", "INDEX+MATCH", "=INDEX(return_range, MATCH(value, lookup_range, 0)) looks up "
          "in any direction.", "Works even when the answer is LEFT of the lookup column.", "Which function goes inside "
          "INDEX to find the row position?", ("MATCH", "XMATCH"), "The position finder."),
@@ -129,13 +129,12 @@ MISSIONS_4 = (
     formula("F4-4.M4", "In J14 return the 5th Price in E6:E20 with INDEX.", "=INDEX(E6:E20,5)", "J14", "=INDEX(E6:E20,5)",
             PRODUCTS[4].price, items=("F4.index",), wrong=("=INDEX(E6:E20,4)",), uses=("INDEX",)),
 )
-STAGE_4 = Stage("F4-4", "Power Couple", "combine INDEX and MATCH for any-direction lookups", ITEMS_4, MISSIONS_4,
-                ARENA_4)
+STAGE_4 = Stage("F4-4", "INDEX and MATCH", ITEMS_4, MISSIONS_4, ARENA_4)
 
-# ------------------------------------------------------------------------------------ F4-5 Tiers
+# ------------------------------------------------------------------------------------ F4-5 Approximate Match
 ITEMS_5 = (
     Item("F4.xlookup_approx", "concept", "match_mode -1", "XLOOKUP(…,,-1): exact match or the next smaller item.",
-         "Perfect for discount tiers and grade bands.", "Which XLOOKUP match_mode returns an exact match or the next "
+         "Use it for discount tiers and grade bands.", "Which XLOOKUP match_mode returns an exact match or the next "
          "smaller item?", ("-1",), "Minus one."),
     Item("F4.vlookup_true", "concept", "VLOOKUP TRUE", "Approximate VLOOKUP: the first column must be sorted "
          "smallest to largest.", "Unsorted bands give wrong answers silently.", "For an approximate VLOOKUP, how must "
@@ -154,7 +153,7 @@ MISSIONS_5 = (
             "TRUE = approximate (sorted bands).", "J9", "=VLOOKUP(I9,L13:M17,2,TRUE)", letter(83),
             items=("F4.vlookup_true",), wrong=("=VLOOKUP(I9,L13:M17,2,FALSE)",), uses=("VLOOKUP",)),
 )
-STAGE_5 = Stage("F4-5", "Tiers", "look up bands, tiers and grades", ITEMS_5, MISSIONS_5, ARENA_5)
+STAGE_5 = Stage("F4-5", "Approximate Match", ITEMS_5, MISSIONS_5, ARENA_5)
 
 # ------------------------------------------------------------------------------------ Boss
 BOSS_IDS = ["P-02", "P-08", "P-15", "P-06"]
@@ -198,7 +197,7 @@ BOSS_MISSIONS = (
 
 WORLD = World(
     code="F4", track="F", order=8, title="Lookups",
-    tagline="Find a value in one column and bring back its partner from another.",
+    tagline="Find a value in one column and return its partner from another.",
     file_name="08 Formulas 4 - Lookups.xlsx",
     stages=(STAGE_1, STAGE_2, STAGE_3, STAGE_4, STAGE_5),
     boss=Boss(BOSS_MISSIONS, BOSS_ARENA, par_minutes=15),

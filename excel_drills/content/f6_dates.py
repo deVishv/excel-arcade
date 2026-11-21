@@ -1,4 +1,4 @@
-"""Formulas 6 · Dates — build, split and shift dates; count days and workdays."""
+"""Formulas 6: Dates. Build, split and shift dates; count days and workdays."""
 import datetime as dt
 
 from ..model import Arena, Boss, Item, Stage, World, formula, merge
@@ -35,7 +35,7 @@ def full_months(start: dt.date, end: dt.date) -> int:
 
 DATE_FMT = "d-mmm-yyyy"
 
-# ------------------------------------------------------------------------------------ F6-1 Calendar
+# ------------------------------------------------------------------------------------ F6-1 Date Parts
 ITEMS_1 = (
     Item("F6.today", "function", "TODAY", "=TODAY() is today's date; it updates every day.",
          "Use Ctrl+; instead when the date must never change.", "Which function returns today's date?", ("TODAY",),
@@ -74,9 +74,9 @@ MISSIONS_1 = (
     formula("F6-1.M6", "In D11 return the weekday number of B6 (Sunday = 1).", "=WEEKDAY(B6)", "D11", "=WEEKDAY(B6)",
             weekday_excel(D1), items=("F6.weekday",), wrong=("=WEEKDAY(B6,2)",), uses=("WEEKDAY",)),
 )
-STAGE_1 = Stage("F6-1", "Calendar", "build dates and take them apart", ITEMS_1, MISSIONS_1, ARENA_1)
+STAGE_1 = Stage("F6-1", "Date Parts", ITEMS_1, MISSIONS_1, ARENA_1)
 
-# ------------------------------------------------------------------------------------ F6-2 Date Math
+# ------------------------------------------------------------------------------------ F6-2 Date Arithmetic
 ITEMS_2 = (
     Item("F6.subtract", "concept", "=end-start", "Subtract two dates to get the days between them.",
          "Dates are numbers underneath, so plain minus works.", "What do you get when you subtract an earlier date "
@@ -85,7 +85,7 @@ ITEMS_2 = (
          "=B6+30 is 30 days after B6.", "Type the formula for the date 30 days after the date in B6.",
          ("=B6+30", "B6+30", "=30+B6", "30+B6"), "Plain plus."),
     Item("F6.datedif", "function", "DATEDIF", 'DATEDIF(start, end, "Y"/"M"/"D") counts full years, months or days.',
-         'Perfect for ages: =DATEDIF(birthday,TODAY(),"Y").', "Which function counts full years or months between "
+         'For an age: =DATEDIF(birthday,TODAY(),"Y").', "Which function counts full years or months between "
          "two dates?", ("DATEDIF",), "DATE plus DIF."),
 )
 ARENA_2 = Arena(
@@ -107,9 +107,9 @@ MISSIONS_2 = (
             '=DATEDIF(B6,B7,"M")', full_months(D1, D2), items=("F6.datedif",), wrong=('=DATEDIF(B6,B7,"D")',),
             uses=("DATEDIF",)),
 )
-STAGE_2 = Stage("F6-2", "Date Math", "add, subtract and measure dates", ITEMS_2, MISSIONS_2, ARENA_2)
+STAGE_2 = Stage("F6-2", "Date Arithmetic", ITEMS_2, MISSIONS_2, ARENA_2)
 
-# ------------------------------------------------------------------------------------ F6-3 Deadlines
+# ------------------------------------------------------------------------------------ F6-3 Months and Workdays
 ITEMS_3 = (
     Item("F6.edate", "function", "EDATE", "EDATE(date, months) moves by whole months.", "=EDATE(B6,3) is 3 months on.",
          "Which function moves a date forward or back by whole months?", ("EDATE",), "E plus DATE."),
@@ -142,7 +142,7 @@ MISSIONS_3 = (
             "=WORKDAY(B6,10)", serial(add_workdays(D1, 10)), items=("F6.workday",), wrong=("=B6+10",),
             uses=("WORKDAY",)),
 )
-STAGE_3 = Stage("F6-3", "Deadlines", "plan with months, month-ends and workdays", ITEMS_3, MISSIONS_3, ARENA_3)
+STAGE_3 = Stage("F6-3", "Months and Workdays", ITEMS_3, MISSIONS_3, ARENA_3)
 
 # ------------------------------------------------------------------------------------ Boss
 B1, B2, HIRED = dt.date(2026, 9, 9), dt.date(2026, 11, 27), dt.date(2019, 4, 30)

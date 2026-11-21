@@ -10,7 +10,7 @@ def _world(code, n_stages, items_per_stage, boss_items=()):
     stages = []
     for s in range(1, n_stages + 1):
         items = tuple(_item(f"{code}.{s}{k}") for k in "abcdefgh"[:items_per_stage])
-        stages.append(Stage(f"{code}-{s}", f"S{s}", "g", items, ()))
+        stages.append(Stage(f"{code}-{s}", f"S{s}", items, ()))
     boss = Boss((find(f"{code}-B.M1", "p", "h", "X", items=boss_items, wrong=("Y",)),), Arena({}, "P"), 5)
     return World(code, "S", 1, "T", "t", f"{code}.xlsx", tuple(stages), boss)
 

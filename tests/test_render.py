@@ -43,7 +43,7 @@ def test_arena_render(tmp_path):
                   pass_code="QUASAR", inputs=("F6:F7",), headers=("B5",), number_formats={"B6": "0.0"},
                   validations={"F7": ("Bronze", "Gold")}, names={"TREASURE": "B6"})
     render_arena(book, ws, arena, title="ARENA ▸ S1-1 WARP ZONES", back_sheet=stage.name)
-    render_extra(book, book.sheet("Rename Me"), "Rename this sheet to Vault.")
+    render_extra(book, book.sheet("Rename Me"))
     book.close()
     wb = openpyxl.load_workbook(tmp_path / "a.xlsx")
     a = wb["S1-1 Arena"]
@@ -76,14 +76,14 @@ def test_stage_sheet(tmp_path):
         formula("S9-1.M2", "Multiply C6 by D6 in F6.", "Use *.", "F6", "=C6*D6", 10, items=("S9.a",), wrong=("=C6+D6",)),
         self_check("S9-1.M3", "Bold B6, then pick Done.", "Ctrl+B.", items=("S9.a",)),
     )
-    stage = Stage("S9-1", "Demo", "test the table", (item,), missions, None)
+    stage = Stage("S9-1", "Demo", (item,), missions, None)
     placed = render_stage(book, ws, key, stage, warmups=[], training=[], recalls=[recall], arena_sheet=aws.name,
                           next_label="S9-2 Next", extra_names={})
     book.close()
     assert placed.max_xp == 40 and len(placed.challenges) == 4
     s = openpyxl.load_workbook(tmp_path / "s.xlsx")["S9-1 Demo"]
     assert s.freeze_panes == "A5" and s.protection.sheet
-    assert s["A1"].value == "STAGE S9-1 ▸ DEMO" and s["A2"].value == "Goal: test the table"
+    assert s["A1"].value == "STAGE S9-1 ▸ DEMO" and s["A2"].value is None
     rows = {pc.label: pc.row for pc in placed.challenges}
     fm = rows["C3"]
     assert s[f"C{fm}"].hyperlink.location == "'S9-1 Arena'!F6"
@@ -94,24 +94,23 @@ def test_stage_sheet(tmp_path):
     assert len(s.conditional_formatting) >= 1
 
 
-from excel_drills.hub_sheet import render_cheat_codes, render_hub
+from excel_drills.hub_sheet import render_hub, render_reference
 from excel_drills.stage_sheet import PlacedSheet
 
 
-def test_hub_and_cheat_codes(tmp_path):
+def test_hub_and_reference(tmp_path):
     book = Book(tmp_path / "h.xlsx", title="t", subject="s", keywords="k")
     hub = book.sheet("Start")
-    codes = book.sheet("Cheat Codes")
+    codes = book.sheet("Reference")
     stage = PlacedSheet("S9-1", "Demo", "S9-1 Demo", None, 12, 20, 80, [])
     boss = PlacedSheet("BOSS", "Boss", "Boss", "Boss Arena", 14, 30, 120, [], gate="Boss!$C$10",
                        time_cell="Boss!$C$8", par=10)
-    refs = render_hub(book, hub, title="SHORTCUTS 9 ▸ DEMO", tagline="Practice.", sheets=[stage], boss=boss)
+    refs = render_hub(book, hub, title="SHORTCUTS 9 ▸ DEMO", sheets=[stage], boss=boss)
     item = Item("S9.a", "shortcut", "Ctrl+A", "Select the data block.", "Press twice.", "q?", ("Ctrl+A",), "h")
-    render_cheat_codes(book, codes, title="CHEAT CODES ▸ DEMO",
-                       stages=(Stage("S9-1", "Demo", "g", (item,), (), None),))
+    render_reference(book, codes, title="REFERENCE ▸ DEMO", stages=(Stage("S9-1", "Demo", (item,), (), None),))
     book.close()
     wb = openpyxl.load_workbook(tmp_path / "h.xlsx")
-    h, c = wb["Start"], wb["Cheat Codes"]
+    h, c = wb["Start"], wb["Reference"]
     assert h["A1"].value == "SHORTCUTS 9 ▸ DEMO" and h.protection.sheet and not h.sheet_view.showGridLines
     assert {"total", "rank", "next", "status:S9-1", "status:BOSS"} <= refs.keys()
     links = [cell.hyperlink.location for row in h.iter_rows() for cell in row if cell.hyperlink]

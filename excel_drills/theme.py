@@ -3,7 +3,7 @@ from __future__ import annotations
 
 FONT_BODY = "Calibri"
 FONT_MONO = "Consolas"
-FONT_SYMBOL = "Segoe UI Symbol"   # holds ✔ ✘ ★ ☆ (Calibri and Consolas do not)
+FONT_SYMBOL = "Segoe UI Symbol"   # holds ✔ ✘ ○ ★ ☆ (Calibri and Consolas do not)
 SIZE_SMALL, SIZE_BODY, SIZE_HEADING, SIZE_TITLE = 11, 12, 14, 20
 
 INK = "#1F2328"
@@ -25,14 +25,14 @@ LINK = "#0B4FA8"
 TAB_COLORS = {"S": "#2F6FDE", "F": "#C2185B", "FINAL": "#B8860B", "DECK": "#2E7D32", "HUB": NAVY}
 
 # Result vocabulary: a symbol and a word, so color is never the only signal.
-OK = "✔ CLEAR"
-OK_SELF = "✔ CLEAR · self-check"
-BAD = "✘ TRY AGAIN"
-TYPED = "✘ That's a typed value · enter a formula"
-NOT_YET = "· not yet"
-NOT_YET_F9 = "· not yet · press F9"
+OK = "✔ Correct"
+OK_SELF = "✔ Done (self-check)"
+BAD = "✘ Try again"
+TYPED = "✘ Typed value: enter a formula"
+NOT_YET = "○ Not yet"
+NOT_YET_F9 = "○ Not yet: press F9"
 LOCKED = "LOCKED"
-LOCKED_PROMPT = "LOCKED · earn ★ on every stage to open the Boss gate"
+LOCKED_PROMPT = "LOCKED: earn a star on every stage to open the Boss"
 SHOW_HINT = "Show hint"
 DONE = "Done"
 
@@ -44,7 +44,6 @@ STYLES: dict[str, dict] = {
     "title": {"font_name": FONT_BODY, "font_size": SIZE_TITLE, "bold": True, "font_color": ARCADE_YELLOW,
               "bg_color": NAVY, "valign": "vcenter"},
     "title_fill": {"font_name": FONT_BODY, "font_size": SIZE_TITLE, "font_color": WHITE, "bg_color": NAVY},
-    "subtitle": {"font_name": FONT_BODY, "font_size": SIZE_BODY, "italic": True, "font_color": MUTED, "valign": "top"},
     "score": {"font_name": FONT_MONO, "font_size": SIZE_HEADING, "bold": True, "font_color": NAVY,
               "valign": "vcenter", "hidden": True},
     "stars": {"font_name": FONT_SYMBOL, "font_size": SIZE_HEADING, "font_color": NAVY, "valign": "vcenter", "hidden": True},
@@ -86,8 +85,6 @@ STYLES: dict[str, dict] = {
     "pass_label": {"font_name": FONT_BODY, "font_size": SIZE_BODY, "bold": True, "font_color": NAVY, "valign": "vcenter"},
     "pass": {"font_name": FONT_MONO, "font_size": SIZE_HEADING, "bold": True, "font_color": NAVY,
              "bg_color": KEY_FILL, "valign": "vcenter"},
-    "trophy": {"font_name": FONT_SYMBOL, "font_size": SIZE_HEADING, "bold": True, "font_color": NAVY,
-               "valign": "vcenter"},
     "arena": dict(_TEXT),
     "arena_head": {"font_name": FONT_BODY, "font_size": SIZE_BODY, "bold": True, "font_color": WHITE, "bg_color": NAVY},
     "arena_label": {**_TEXT, "bold": True},

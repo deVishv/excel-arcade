@@ -1,4 +1,4 @@
-"""Formulas 2 · Logic — make formulas decide: comparisons, IF, AND/OR/NOT, IFS and error shields."""
+"""Formulas 2: Logic. Comparisons, IF, AND/OR/NOT, IFS and error handling."""
 from ..model import Arena, Boss, Formula, Item, Stage, World, filled, find, formula, merge, table
 
 
@@ -23,7 +23,7 @@ def people_arena(pass_code: str, extra: dict, inputs: tuple, headers: tuple = ()
                  headers=("B5:E5", *headers), labels=labels, widths={"F": 14, "G": 14})
 
 
-# ------------------------------------------------------------------------------------ F2-1 True or False
+# ------------------------------------------------------------------------------------ F2-1 Comparisons
 ITEMS_1 = (
     Item("F2.compare", "concept", ">=", "Compare two values: = < > <= >= give TRUE or FALSE.",
          "=B2>=50 is TRUE when B2 is 50 or more.", "Which operator means 'greater than or equal to'?", (">=",),
@@ -46,9 +46,9 @@ MISSIONS_1 = (
                        "Excel ignores case when it compares text.", "Text needs quotes.", "G8", '=E8="yes"', True,
             items=("F2.quotes",), wrong=('=E8="no"',)),
 )
-STAGE_1 = Stage("F2-1", "True or False", "ask Excel yes-or-no questions", ITEMS_1, MISSIONS_1, ARENA_1)
+STAGE_1 = Stage("F2-1", "Comparisons", ITEMS_1, MISSIONS_1, ARENA_1)
 
-# ------------------------------------------------------------------------------------ F2-2 Fork in the Road
+# ------------------------------------------------------------------------------------ F2-2 IF
 ITEMS_2 = (
     Item("F2.if", "function", "IF", "IF(test, value_if_true, value_if_false) picks one of two results.",
          '=IF(B2>=50,"Pass","Fail")', "Which function returns one value when a test is TRUE and another when FALSE?",
@@ -56,7 +56,7 @@ ITEMS_2 = (
     Item("F2.if_math", "concept", "IF + math", "Each branch can be a calculation, not just text.",
          "=IF(B2>100,B2*0.9,B2) discounts only big orders.", "In =IF(B2>100,B2*0.9,B2), what is returned when B2 is 50?",
          ("50",), "50 is not more than 100."),
-    Item("F2.empty_text", "concept", '""', 'Two quotes with nothing between = empty text, a blank-looking result.',
+    Item("F2.empty_text", "concept", '""', 'Two quotes with nothing between them: empty text, which looks blank.',
          '=IF(A2="","",A2*2) stays blank until A2 has a value.', "What do you type in a formula for an empty, "
          "blank-looking result?", ('""',), "Two double quotes, nothing inside."),
 )
@@ -75,9 +75,9 @@ MISSIONS_2 = (
                        "J6*2.", '=IF(J6="","",J6*2)', "I6", '=IF(J6="","",J6*2)', "", items=("F2.empty_text",),
             wrong=("=J6*2",), uses=(("IF", "IFS"),)),
 )
-STAGE_2 = Stage("F2-2", "Fork in the Road", "return different results with IF", ITEMS_2, MISSIONS_2, ARENA_2)
+STAGE_2 = Stage("F2-2", "IF", ITEMS_2, MISSIONS_2, ARENA_2)
 
-# ------------------------------------------------------------------------------------ F2-3 Combo Moves
+# ------------------------------------------------------------------------------------ F2-3 AND, OR, NOT
 ITEMS_3 = (
     Item("F2.and", "function", "AND", "TRUE only when every condition is TRUE.", "=AND(B2>=18,C2=\"Yes\")",
          "Which function is TRUE only when all its conditions are TRUE?", ("AND",), "Three letters: all must pass."),
@@ -102,9 +102,9 @@ MISSIONS_3 = (
     formula("F2-3.M3", 'In I6 return TRUE when Ava (row 6) does NOT have a License of "Yes". Use NOT.',
             'NOT(E6="Yes")', "I6", '=NOT(E6="Yes")', True, items=("F2.not",), wrong=('=E6="Yes"',), uses=("NOT",)),
 )
-STAGE_3 = Stage("F2-3", "Combo Moves", "combine conditions with AND, OR and NOT", ITEMS_3, MISSIONS_3, ARENA_3)
+STAGE_3 = Stage("F2-3", "AND, OR, NOT", ITEMS_3, MISSIONS_3, ARENA_3)
 
-# ------------------------------------------------------------------------------------ F2-4 Multi-Level
+# ------------------------------------------------------------------------------------ F2-4 Nested IF and IFS
 def grade(score: int) -> str:
     return "A" if score >= 90 else "B" if score >= 75 else "C"
 
@@ -138,13 +138,13 @@ MISSIONS_4 = (
            [medal(p[1]) for p in PEOPLE], items=("F2.ifs", "F2.ifs_true"),
            wrong_for=lambda c: f'=IFS(C{_r(c)}>=90,"Gold",C{_r(c)}>=75,"Silver",C{_r(c)}>=60,"Bronze")',
            uses=("IFS",)),
-    find("F2-4.M3", 'What does =IFS(5>9,"A",5>3,"B",TRUE,"C") return? (It is written as text in the arena\'s I6 if '
-                    "you want to try it.) Type the result.", "IFS stops at the first TRUE test.", "B",
+    find("F2-4.M3", 'What does =IFS(5>9,"A",5>3,"B",TRUE,"C") return? Type the result. To check it, select I6 in '
+                    "the arena (it holds the formula as text), press F2, then Enter.", "IFS stops at the first TRUE test.", "B",
          items=("F2.ifs",), wrong=("C",)),
 )
-STAGE_4 = Stage("F2-4", "Multi-Level", "handle three or more outcomes", ITEMS_4, MISSIONS_4, ARENA_4)
+STAGE_4 = Stage("F2-4", "Nested IF and IFS", ITEMS_4, MISSIONS_4, ARENA_4)
 
-# ------------------------------------------------------------------------------------ F2-5 Error Shield
+# ------------------------------------------------------------------------------------ F2-5 Errors and Blanks
 UNITS = [["Pens", 120, 10], ["Ink", 90, 0], ["Pads", 60, 4], ["Tape", 0, 0], ["Glue", 45, 9], ["Clips", 30, 0]]
 NAMES = ["Ava", None, "Cy", None, "Eli"]
 ENTRIES = [12, "12", 7.5, "n/a", 3]
@@ -153,7 +153,7 @@ ITEMS_5 = (
          "=IFERROR(A2/B2,0) shows 0 instead of #DIV/0!.", "Which function replaces any error with your own value?",
          ("IFERROR",), "IF plus ERROR."),
     Item("F2.ifna", "function", "IFNA", "Replace only #N/A, the 'not found' error.",
-         "Ideal around lookups: other errors still show.", "Which function replaces only the #N/A error?",
+         "Use it around lookups so other errors still show.", "Which function replaces only the #N/A error?",
          ("IFNA",), "IF plus NA."),
     Item("F2.isblank", "function", "ISBLANK", "TRUE if a cell is empty.", '=IF(ISBLANK(A2),"Missing","OK")',
          "Which function is TRUE when a cell is empty?", ("ISBLANK",), "IS plus BLANK."),
@@ -164,7 +164,7 @@ ITEMS_5 = (
 ARENA_5 = Arena(
     cells=merge(
         table("B5", ["Product", "Total", "Units"], UNITS), {"E5": "Per unit"},
-        {"B14": "Lookup result →", "D14": Formula("=NA()", "#N/A", error_ok=True), "E14": "Shielded →"},
+        {"B14": "Lookup result →", "D14": Formula("=NA()", "#N/A", error_ok=True), "E14": "With IFNA →"},
         table("B16", ["Name"], [[n] for n in NAMES]), {"C16": "Check"},
         table("D22", ["Entry"], [[e] for e in ENTRIES]), {"E22": "Type"},
     ),
@@ -189,7 +189,7 @@ MISSIONS_5 = (
            ["Number" if isinstance(e, (int, float)) else "Text" for e in ENTRIES], items=("F2.isnumber",),
            wrong_for=lambda c: f'=IF(ISTEXT(D{_r(c)}),"Text","Number")', uses=("ISNUMBER",)),
 )
-STAGE_5 = Stage("F2-5", "Error Shield", "keep errors and blanks from breaking your sheet", ITEMS_5, MISSIONS_5, ARENA_5)
+STAGE_5 = Stage("F2-5", "Errors and Blanks", ITEMS_5, MISSIONS_5, ARENA_5)
 
 # ------------------------------------------------------------------------------------ Boss
 BOSS_ARENA = Arena(
@@ -240,7 +240,7 @@ BOSS_MISSIONS = (
 
 WORLD = World(
     code="F2", track="F", order=4, title="Logic",
-    tagline="Make formulas decide: comparisons, IF, AND/OR/NOT, IFS and error shields.",
+    tagline="Comparisons, IF, AND/OR/NOT, IFS and error handling.",
     file_name="04 Formulas 2 - Logic.xlsx",
     stages=(STAGE_1, STAGE_2, STAGE_3, STAGE_4, STAGE_5),
     boss=Boss(BOSS_MISSIONS, BOSS_ARENA, par_minutes=15),

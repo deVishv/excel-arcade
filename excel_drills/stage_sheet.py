@@ -20,7 +20,7 @@ INPUT_MESSAGES = {
     "RECALL": ("Type your answer", "Type keys joined with +, like Ctrl+Shift+L. For a function, type its name, "
                                    "like SUMIFS. Case and spaces don't matter."),
     "PICK": ("Pick an answer", "Press Alt+Down to open the list, choose with the arrow keys, then press Enter."),
-    "FIND": ("Type what you found", "Do the move in the arena, then type the word or number you found here."),
+    "FIND": ("Type what you found", "Do the task in the arena, then type the word or number you found here."),
     "SELF": ("Self-check", "Do the task in the arena, then pick Done from the list (Alt+Down)."),
 }
 HINT_TITLE, HINT_MESSAGE = "Need a hint?", "Pick 'Show hint' (Alt+Down). This question then gives 5 XP instead of 10."
@@ -167,21 +167,19 @@ def setup_columns(ws) -> None:
     ws.repeat_rows(0, 3)
 
 
-def write_header(book: Book, ws, *, title: str, purpose: str, first: int, last: int, max_xp: int,
-                 next_label: str | None) -> None:
+def write_header(book: Book, ws, *, title: str, first: int, last: int, max_xp: int, next_label: str | None) -> None:
     f = book.fmt
     book.text(ws, "A1", title, f("title"))
     for col in COLS[1:]:
         ws.write_blank(f"{col}1", None, f("title_fill"))
     ws.set_row(0, 34)
-    book.text(ws, "A2", purpose, f("subtitle"))
     total = f"SUM($G${first}:$G${last})"
     book.formula(ws, "A3", f'="SCORE "&TEXT({total},"0000")&" / {max_xp:04d}"', f"SCORE 0000 / {max_xp:04d}",
                  f("score"))
     book.formula(ws, "C3", stars_formula(total, max_xp), "☆☆☆", f("stars"))
     book.formula(ws, "D3", bar_formula(total, max_xp), "░" * 10 + "  0%", f("bar"))
     if next_label:
-        book.formula(ws, "F3", f'=IF({total}>={max_xp}*0.5,{q("STAGE CLEAR! ▶ Next: " + next_label)},"")', "",
+        book.formula(ws, "F3", f'=IF({total}>={max_xp}*0.5,{q("Cleared. Next: " + next_label)},"")', "",
                      f("banner"))
     ws.set_row(2, 26)
     ws.freeze_panes(4, 0)
@@ -197,8 +195,8 @@ def add_result_colors(book: Book, ws, first: int, last: int) -> None:
 
 def _briefing(table: ChallengeTable, items: tuple[Item, ...]) -> None:
     b, ws, f = table.book, table.ws, table.book.fmt
-    table.band("BRIEFING · new moves in this stage")
-    table.header(("#", "What it does · Pro tip", "Keys / Syntax", "", "", "", ""))
+    table.band("BRIEFING")
+    table.header(("#", "What it does / Tip", "Keys / Syntax", "", "", "", ""))
     for n, item in enumerate(items, 1):
         r = table.r
         b.text(ws, f"A{r}", n, f("body_center"))
@@ -209,11 +207,11 @@ def _briefing(table: ChallengeTable, items: tuple[Item, ...]) -> None:
         table.r += 1
 
 
-def _finish(book: Book, ws, table: ChallengeTable, *, code: str, name: str, title: str, purpose: str,
-            next_label: str | None, **extra) -> PlacedSheet:
+def _finish(book: Book, ws, table: ChallengeTable, *, code: str, name: str, title: str, next_label: str | None,
+            **extra) -> PlacedSheet:
     first, last = table.placed[0].row, table.placed[-1].row
     max_xp = 10 * len(table.placed)
-    write_header(book, ws, title=title, purpose=purpose, first=first, last=last, max_xp=max_xp, next_label=next_label)
+    write_header(book, ws, title=title, first=first, last=last, max_xp=max_xp, next_label=next_label)
     add_result_colors(book, ws, first, last)
     ws.protect("", PROTECT)
     return PlacedSheet(code, name, ws.name, table.arena_sheet, first, last, max_xp, table.placed, **extra)
@@ -225,28 +223,28 @@ def render_stage(book: Book, ws, key: KeySheet, stage: Stage, *, warmups: list[C
     t = ChallengeTable(book, ws, key, arena_sheet=arena_sheet, start_row=5, extra_names=extra_names)
     _briefing(t, stage.items)
     t.blank()
-    t.band("WARM-UP · flashback to earlier stages")
+    t.band("WARM-UP")
     if warmups:
         t.header()
         for i, ch in enumerate(warmups, 1):
             t.add(ch, f"W{i}", "warmup")
     else:
-        t.note("Nothing to review yet — fresh start!")
+        t.note("Nothing to review yet.")
     if training:
         t.blank()
-        t.band("TRAINING · recognize the move (pick from the list)")
+        t.band("TRAINING")
         t.header()
         for i, ch in enumerate(training, 1):
             t.add(ch, f"T{i}", "training")
     t.blank()
-    t.band("CHALLENGES · recall it, then do it")
+    t.band("CHALLENGES")
     if arena_sheet:
         t.link(f"▶ Open {arena_sheet} (or press Ctrl+PgDn)", arena_sheet)
     t.header()
     for i, ch in enumerate([*recalls, *stage.missions], 1):
         t.add(ch, f"C{i}", "challenge")
     return _finish(book, ws, t, code=stage.code, name=stage.name, title=f"STAGE {stage.code} ▸ {stage.name.upper()}",
-                   purpose=f"Goal: {stage.goal}", next_label=next_label)
+                   next_label=next_label)
 
 
 def render_boss(book: Book, ws, key: KeySheet, *, title: str, boss: Boss, flashbacks: list[Challenge],
@@ -254,12 +252,12 @@ def render_boss(book: Book, ws, key: KeySheet, *, title: str, boss: Boss, flashb
     setup_columns(ws)
     b, f = book, book.fmt
     t = ChallengeTable(book, ws, key, arena_sheet=arena_sheet, start_row=5, extra_names=extra_names, gate="$C$10")
-    t.band("SPEEDRUN · stamp START, beat the Boss, stamp FINISH")
+    t.band("TIMER")
     stamp = {"validate": "any", "input_title": "Stamp the time", "input_message": "Press Ctrl+Shift+: to type the current time."}
-    b.text(ws, "B6", "START · select C6 and press Ctrl+Shift+:", f("label"))
+    b.text(ws, "B6", "START: select C6, press Ctrl+Shift+:", f("label"))
     ws.write_blank("C6", None, f("input_time"))
     ws.data_validation("C6", stamp)
-    b.text(ws, "B7", "FINISH · select C7 and press Ctrl+Shift+:", f("label"))
+    b.text(ws, "B7", "FINISH: select C7, press Ctrl+Shift+:", f("label"))
     ws.write_blank("C7", None, f("input_time"))
     ws.data_validation("C7", stamp)
     b.text(ws, "B8", "TIME", f("label"))
@@ -269,11 +267,11 @@ def render_boss(book: Book, ws, key: KeySheet, *, title: str, boss: Boss, flashb
     b.text(ws, "B10", "BOSS GATE", f("label"))
     cond = ",".join(f"SUM({p.xp_range})>={p.max_xp}*0.5" for p in stages)
     b.formula(ws, "C10", f'=IF(AND({cond}),"OPEN","LOCKED")', "LOCKED", f("calc_bold"))
-    closed = "Earn ★ on every stage to open the gate"
-    b.formula(ws, "D10", f'=IF(C10="OPEN","Gate open · go!",{q(closed)})', closed, f("calc"))
+    closed = "Earn a star on every stage to open the gate"
+    b.formula(ws, "D10", f'=IF(C10="OPEN","Gate open",{q(closed)})', closed, f("calc"))
     t.r = 12
     if flashbacks:
-        t.band("FLASHBACK · moves from earlier worlds")
+        t.band("REVIEW")
         t.header()
         for i, ch in enumerate(flashbacks, 1):
             t.add(ch, f"F{i}", "flashback")
@@ -283,10 +281,8 @@ def render_boss(book: Book, ws, key: KeySheet, *, title: str, boss: Boss, flashb
     t.header()
     for i, ch in enumerate(boss.missions, 1):
         t.add(ch, f"B{i}", "boss")
-    return _finish(book, ws, t, code="BOSS", name="Boss", title=f"BOSS ▸ {title.upper()}",
-                   purpose="Every move from this world in one gauntlet. Clear it under par for rank S.",
-                   next_label=None, gate=sheet_ref(ws.name, "C10"), time_cell=sheet_ref(ws.name, "C8"),
-                   par=boss.par_minutes)
+    return _finish(book, ws, t, code="BOSS", name="Boss", title=f"BOSS ▸ {title.upper()}", next_label=None,
+                   gate=sheet_ref(ws.name, "C10"), time_cell=sheet_ref(ws.name, "C8"), par=boss.par_minutes)
 
 
 def render_round(book: Book, ws, key: KeySheet, rnd: FinalRound, *, recalls: list[Challenge], arena_sheet: str,
@@ -294,7 +290,7 @@ def render_round(book: Book, ws, key: KeySheet, rnd: FinalRound, *, recalls: lis
     setup_columns(ws)
     t = ChallengeTable(book, ws, key, arena_sheet=arena_sheet, start_row=5, extra_names=extra_names)
     if recalls:
-        t.band("GAUNTLET · rapid recall from the whole course")
+        t.band("RECALL")
         t.header()
         for i, ch in enumerate(recalls, 1):
             t.add(ch, f"G{i}", "gauntlet")
@@ -305,4 +301,4 @@ def render_round(book: Book, ws, key: KeySheet, rnd: FinalRound, *, recalls: lis
     for i, ch in enumerate(rnd.missions, 1):
         t.add(ch, f"M{i}", "mission")
     return _finish(book, ws, t, code=rnd.code, name=rnd.name, title=f"{rnd.code} ▸ {rnd.name.upper()}",
-                   purpose=f"Goal: {rnd.goal}", next_label=next_label)
+                   next_label=next_label)

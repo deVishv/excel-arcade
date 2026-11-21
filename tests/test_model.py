@@ -16,7 +16,7 @@ def test_arena_helpers():
 
 def test_count_filled_includes_fixed_header_cells():
     arena = Arena(cells={"B6": 1, "B7": "x", "C6": Formula("=B6*2", 2)}, pass_code="P")
-    assert count_filled(arena, "A1:C7") == 4 + 3      # A1 A2 A3 B3 + 3 data cells (D3 is outside)
+    assert count_filled(arena, "A1:C7") == 3 + 3      # A1 A3 B3 + 3 data cells (D3 is outside, A2 stays empty)
     assert count_filled(arena, "B6:B7") == 2
 
 
@@ -60,7 +60,7 @@ def test_spill_do_and_self_constructors():
 def _world(**over):
     item = Item("W1.a", "shortcut", "Ctrl+A", "what", "tip", "prompt?", ("Ctrl+A",), "hint")
     arena = Arena(cells={"B6": 1}, pass_code="P")
-    stage = Stage("W1-1", "One", "goal", (item,), (find("W1-1.M1", "p", "h", "X", items=("W1.a",), wrong=("Y",)),), arena)
+    stage = Stage("W1-1", "One", (item,), (find("W1-1.M1", "p", "h", "X", items=("W1.a",), wrong=("Y",)),), arena)
     boss = Boss((find("W1-B.M1", "p", "h", "X", items=("W1.a",), wrong=("Y",)),), arena, 5)
     fields = dict(code="W1", track="S", order=1, title="T", tagline="t", file_name="f.xlsx", stages=(stage,), boss=boss)
     fields.update(over)

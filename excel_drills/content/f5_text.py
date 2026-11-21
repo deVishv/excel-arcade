@@ -1,9 +1,9 @@
-"""Formulas 5 · Text — cut, clean, search and assemble text with formulas."""
+"""Formulas 5: Text. Extract, clean, search and join text with formulas."""
 import datetime as dt
 
 from ..model import Arena, Boss, Item, Stage, World, column, formula, merge
 
-# ------------------------------------------------------------------------------------ F5-1 Cut & Splice
+# ------------------------------------------------------------------------------------ F5-1 Extract and Join
 CODE = "AB-1234-X"
 ITEMS_1 = (
     Item("F5.left", "function", "LEFT", "LEFT(text, n): the first n characters.", '=LEFT("AB-1234-X",2) gives AB.',
@@ -13,8 +13,8 @@ ITEMS_1 = (
     Item("F5.mid", "function", "MID", "MID(text, start, n): n characters from position start.",
          '=MID("AB-1234-X",4,4) gives 1234.', "Which function returns characters from the middle of a text?",
          ("MID",), "Short for middle."),
-    Item("F5.len", "function", "LEN", "LEN(text): how many characters, spaces included.", "Great for spotting extra "
-         "spaces.", "Which function counts the characters in a text?", ("LEN",), "Short for length."),
+    Item("F5.len", "function", "LEN", "LEN(text): how many characters, spaces included.", "Compare LEN before and after "
+         "TRIM to spot extra spaces.", "Which function counts the characters in a text?", ("LEN",), "Short for length."),
     Item("F5.amp", "concept", "&", 'Join text with &: =B13&" "&C13.', 'Add " " between pieces for a space.',
          "Which character joins pieces of text in a formula?", ("&", "ampersand"), "Shift+7."),
 )
@@ -37,20 +37,20 @@ MISSIONS_1 = (
             "E13", '=B13&" "&C13', "Grace Hopper", items=("F5.amp",), wrong=("=B13&C13",), contains=("&",),
             case_sensitive=True),
 )
-STAGE_1 = Stage("F5-1", "Cut & Splice", "cut pieces out of text and glue them together", ITEMS_1, MISSIONS_1, ARENA_1)
+STAGE_1 = Stage("F5-1", "Extract and Join", ITEMS_1, MISSIONS_1, ARENA_1)
 
-# ------------------------------------------------------------------------------------ F5-2 Clean Up
+# ------------------------------------------------------------------------------------ F5-2 Clean Text
 MESSY = "  ada   LOVELACE "
 ITEMS_2 = (
     Item("F5.trim", "function", "TRIM", "Remove extra spaces: leading, trailing and doubles.",
-         "Imported data is full of hidden spaces.", "Which function removes extra spaces from text?", ("TRIM",),
+         "Imported data often has leading and trailing spaces.", "Which function removes extra spaces from text?", ("TRIM",),
          "Trims the edges."),
-    Item("F5.upper", "function", "UPPER", "Convert text to CAPITALS.", "Handy for codes and IDs.",
+    Item("F5.upper", "function", "UPPER", "Convert text to CAPITALS.", "Use it to standardize codes and IDs.",
          "Which function converts text to all capitals?", ("UPPER",), "Upper case."),
-    Item("F5.lower", "function", "LOWER", "Convert text to lowercase.", "Good for email addresses.",
+    Item("F5.lower", "function", "LOWER", "Convert text to lowercase.", "Use it to standardize email addresses.",
          "Which function converts text to all lowercase?", ("LOWER",), "Lower case."),
     Item("F5.proper", "function", "PROPER", "Capitalize Each Word.", "Combine with TRIM to tidy names.",
-         "Which function capitalizes the first letter of each word?", ("PROPER",), "Proper names."),
+         "Which function capitalizes the first letter of each word?", ("PROPER",), "Six letters."),
     Item("F5.substitute", "function", "SUBSTITUTE", "SUBSTITUTE(text, old, new): replace every old with new.",
          '=SUBSTITUTE(A2,"-","/") turns 2026-03-15 into 2026/03/15.', "Which function replaces every occurrence of "
          "some text with other text?", ("SUBSTITUTE",), "Swap one thing for another."),
@@ -74,14 +74,14 @@ MISSIONS_2 = (
             "PROPER around TRIM.", "D10", "=PROPER(TRIM(B6))", "Ada Lovelace", items=("F5.proper", "F5.trim"),
             wrong=("=PROPER(B6)",), uses=("PROPER", "TRIM"), case_sensitive=True),
 )
-STAGE_2 = Stage("F5-2", "Clean Up", "tidy messy text", ITEMS_2, MISSIONS_2, ARENA_2)
+STAGE_2 = Stage("F5-2", "Clean Text", ITEMS_2, MISSIONS_2, ARENA_2)
 
-# ------------------------------------------------------------------------------------ F5-3 Find the Gem
+# ------------------------------------------------------------------------------------ F5-3 FIND and SEARCH
 EMAIL, NAME = "kim@arcade.io", "Grace Hopper"
 ITEMS_3 = (
     Item("F5.find", "function", "FIND", "FIND(what, text): the position of what. Case-sensitive.",
          '=FIND("@","kim@arcade.io") gives 4.', "Which function returns the position of text, matching case?",
-         ("FIND",), "It finds things."),
+         ("FIND",), "Four letters."),
     Item("F5.search", "function", "SEARCH", "SEARCH(what, text): like FIND, but ignores case and allows wildcards.",
          "Use SEARCH when you don't care about capitals.", "Which function returns a position while ignoring case?",
          ("SEARCH",), "Like FIND, but case-blind."),
@@ -109,9 +109,9 @@ MISSIONS_3 = (
             items=("F5.find", "F5.mid"), wrong=('=MID(B7,FIND(" ",B7),100)',), uses=("MID", "FIND"),
             case_sensitive=True),
 )
-STAGE_3 = Stage("F5-3", "Find the Gem", "locate text inside text and cut around it", ITEMS_3, MISSIONS_3, ARENA_3)
+STAGE_3 = Stage("F5-3", "FIND and SEARCH", ITEMS_3, MISSIONS_3, ARENA_3)
 
-# ------------------------------------------------------------------------------------ F5-4 Assemble
+# ------------------------------------------------------------------------------------ F5-4 TEXTJOIN, TEXT, VALUE
 TAGS = ["red", "green", None, "blue", "gold"]
 ITEMS_4 = (
     Item("F5.textjoin", "function", "TEXTJOIN", "TEXTJOIN(delimiter, ignore_empty, range) joins a whole range.",
@@ -146,7 +146,7 @@ MISSIONS_4 = (
             "Total: $1,234.50", items=("F5.text", "F5.amp"), wrong=('="Total: "&B16',), uses=("TEXT",),
             case_sensitive=True),
 )
-STAGE_4 = Stage("F5-4", "Assemble", "join, format and convert text", ITEMS_4, MISSIONS_4, ARENA_4)
+STAGE_4 = Stage("F5-4", "TEXTJOIN, TEXT, VALUE", ITEMS_4, MISSIONS_4, ARENA_4)
 
 # ------------------------------------------------------------------------------------ Boss
 BOSS_ARENA = Arena(
@@ -186,7 +186,7 @@ BOSS_MISSIONS = (
 
 WORLD = World(
     code="F5", track="F", order=9, title="Text",
-    tagline="Cut, clean, search and assemble text with formulas.",
+    tagline="Extract, clean, search and join text with formulas.",
     file_name="09 Formulas 5 - Text.xlsx",
     stages=(STAGE_1, STAGE_2, STAGE_3, STAGE_4),
     boss=Boss(BOSS_MISSIONS, BOSS_ARENA, par_minutes=15),

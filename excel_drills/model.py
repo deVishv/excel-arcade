@@ -13,7 +13,7 @@ from .refs import cells_in, on_arena, row_of
 
 ItemKind = Literal["shortcut", "function", "concept"]
 ChallengeKind = Literal["PICK", "RECALL", "FIND", "DO", "FORMULA", "SELF"]
-ARENA_HEADER_CELLS = ("A1", "A2", "A3", "B3", "D3")   # title, purpose, PASS CODE label/value, back link
+ARENA_HEADER_CELLS = ("A1", "A3", "B3", "D3")   # title, PASS CODE label/value, back link
 ARENA_FIRST_ROW = 5
 
 
@@ -81,11 +81,10 @@ class Challenge:
 class Stage:
     code: str
     name: str
-    goal: str
     items: tuple[Item, ...]
     missions: tuple[Challenge, ...]
     arena: Arena | None = None
-    extra_sheets: tuple[tuple[str, str], ...] = ()
+    extra_sheets: tuple[str, ...] = ()          # plain sheets a mission works on, e.g. "Rename Me"
 
 
 @dataclass(frozen=True)
@@ -111,7 +110,6 @@ class World:
 class FinalRound:
     code: str
     name: str
-    goal: str
     recall_kinds: tuple[str, ...]
     missions: tuple[Challenge, ...]
     arena: Arena
@@ -261,7 +259,7 @@ def validate_world(world: World) -> list[str]:
     for n, stage in enumerate(world.stages, 1):
         where = stage.code
         if stage.code != f"{world.code}-{n}":
-            problems.append(f"{where}: stage codes must run {world.code}-1, {world.code}-2, …")
+            problems.append(f"{where}: stage codes must run {world.code}-1, {world.code}-2 and so on")
         for item in stage.items:
             if item.id in seen_items or not item.id.startswith(world.code + "."):
                 problems.append(f"{where}: bad or duplicate item id {item.id}")

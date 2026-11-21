@@ -171,8 +171,8 @@ def test_full_playthrough(code, built, excel):
         assert not spills, spills[:20]
         for s in stages:
             assert read(wb, b.hub[f"status:{s.code}"]) == "PERFECT"
-        assert read(wb, b.hub["status:BOSS"]) == "DEFEATED"
-        assert read(wb, b.hub["next"]) == "All clear! Aim for rank S"     # found in review: stuck on "the Boss"
+        assert read(wb, b.hub["status:BOSS"]) == "CLEARED"
+        assert read(wb, b.hub["next"]) == "All cleared. Aim for rank S"   # found in review: stuck on "the Boss"
         assert read(wb, b.hub["rank"]) == "A"                      # 100% but no time stamped yet
         sheet_name, _ = split_ref(boss.time_cell)
         bws = wb.Worksheets(sheet_name)

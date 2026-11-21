@@ -7,9 +7,6 @@ from .model import Arena, Formula
 from .refs import cells_in, sheet_ref
 from .writer import Book
 
-PURPOSE = "Practice area · everything here is editable. Missions and their checks are on the stage sheet."
-
-
 def _expand(specs) -> set[str]:
     out: set[str] = set()
     for spec in specs:
@@ -32,7 +29,6 @@ def render_arena(book: Book, ws, arena: Arena, *, title: str, back_sheet: str) -
     for spec, width in arena.widths.items():
         ws.set_column(spec if ":" in spec else f"{spec}:{spec}", width)
     book.text(ws, "A1", title, f("title"))
-    book.text(ws, "A2", PURPOSE, f("subtitle"))
     book.text(ws, "A3", "PASS CODE", f("pass_label"))
     book.text(ws, "B3", arena.pass_code, f("pass"))
     ws.write_url("D3", f"internal:{quote_sheetname(back_sheet)}!A1", f("link"), string=f"◀ Back to {back_sheet}")
@@ -51,6 +47,8 @@ def render_arena(book: Book, ws, arena: Arena, *, title: str, back_sheet: str) -
             book.put(ws, cell, value, style(cell))
     for cell in sorted(inputs - arena.cells.keys()):
         ws.write_blank(cell, None, style(cell))
+    for cell in sorted(num.keys() - arena.cells.keys() - inputs):      # e.g. where a FILTER will spill dates
+        ws.write_blank(cell, None, style(cell))
     for cell, values in arena.validations.items():
         ws.data_validation(cell, {"validate": "list", "source": list(values), "input_title": "Pick from the list",
                                   "input_message": "Press Alt+Down to open the list, then choose with the arrow keys."})
@@ -58,7 +56,6 @@ def render_arena(book: Book, ws, arena: Arena, *, title: str, back_sheet: str) -
         book.wb.define_name(name, "=" + sheet_ref(ws.name, cell))
 
 
-def render_extra(book: Book, ws, purpose: str) -> None:
+def render_extra(book: Book, ws) -> None:
     """A plain extra sheet a mission works on (e.g. 'Rename Me')."""
     book.text(ws, "A1", ws.name.upper(), book.fmt("title"))
-    book.text(ws, "A2", purpose, book.fmt("subtitle"))

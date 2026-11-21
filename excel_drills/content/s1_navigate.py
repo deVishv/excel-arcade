@@ -1,19 +1,19 @@
-"""Shortcuts 1 · Navigate & Select — move and select anywhere on a sheet without the mouse."""
+"""Shortcuts 1: Navigate & Select. Move around a sheet and select cells without the mouse."""
 from ..model import Arena, Boss, Item, Stage, World, column, count_filled, find, merge, row, table
 from ..refs import row_of
 
-# ------------------------------------------------------------------------------------ S1-1 Warp Zones
+# ------------------------------------------------------------------------------------ S1-1 Jump to Edges
 ITEMS_1 = (
     Item("S1.ctrl_arrow", "shortcut", "Ctrl+Arrow", "Jump to the edge of the current data block.",
-         "Land on a blank? The next press leaps to the next filled cell.",
+         "From a blank cell, the next press jumps to the next filled cell.",
          "Which keys jump to the edge of the current data block (any direction)?",
          ("Ctrl+Arrow", "Ctrl+Down", "Ctrl+Up", "Ctrl+Left", "Ctrl+Right"), "Hold Ctrl and tap an arrow key."),
     Item("S1.ctrl_home", "shortcut", "Ctrl+Home", "Jump to cell A1, the top-left corner of the sheet.",
-         "The fastest way back to the start of any sheet.",
+         "Ctrl+End does the opposite: it jumps to the last used cell.",
          "Which keys take you to the very first cell of the sheet (A1)?", ("Ctrl+Home",),
          "Ctrl plus the key that means 'start'."),
     Item("S1.ctrl_end", "shortcut", "Ctrl+End", "Jump to the last used cell: lowest used row, rightmost used column.",
-         "A quick way to see how big a sheet really is.",
+         "Shows how far the used range really goes, including stray entries far from the data.",
          "Which keys jump to the last used cell on the sheet?", ("Ctrl+End",), "Ctrl plus the opposite of Home."),
     Item("S1.home", "shortcut", "Home", "Move to column A of the row you are in.",
          "Ctrl+Home goes to A1; Home alone stays in your row.",
@@ -31,14 +31,13 @@ ARENA_1 = Arena(
     pass_code="QUASAR", headers=("B5", "D5", "F9"), labels=("H20",),
 )
 MISSIONS_1 = (
-    find("S1-1.M1", "In the arena, click B6 and press Ctrl+↓. You fly to the bottom of the TRAIL. "
-                    "Type the word you land on.", "Ctrl+↓ stops at the last filled cell before a blank.", "COMET",
+    find("S1-1.M1", "In the arena, click B6 and press Ctrl+↓. Type the word in the cell you land on.", "Ctrl+↓ stops at the last filled cell before a blank.", "COMET",
          items=("S1.ctrl_arrow",), wrong=("TRAIL",), verify=("end", "B6", "down")),
-    find("S1-1.M2", "In the arena, click D6. Keep pressing Ctrl+↓: each press jumps to the next edge, even across "
-                    "the gaps. Type the word where the islands end.", "Just keep pressing until you reach a word.",
+    find("S1-1.M2", "In the arena, click D6 and press Ctrl+↓ repeatedly. Each press stops at the next edge, so it "
+                    "crosses the gaps. Type the word you reach.", "Keep pressing until you reach a word.",
          "NEBULA", items=("S1.ctrl_arrow",), wrong=("ISLANDS",), verify=("end_chain", "D6", "down", 6)),
     find("S1-1.M3", "In the arena, click F10 and press Ctrl+→. Type the word you land on.",
-         "→ works just like ↓, sideways.", "PULSAR", items=("S1.ctrl_arrow",), wrong=("ORBIT",),
+         "Ctrl+→ works like Ctrl+↓, along the row.", "PULSAR", items=("S1.ctrl_arrow",), wrong=("ORBIT",),
          verify=("end", "F10", "right")),
     find("S1-1.M4", "In the arena, press Ctrl+End to jump to the last used cell. Type the word there.",
          "Ctrl+End = lowest used row + rightmost used column.", "ORBIT", items=("S1.ctrl_end",),
@@ -47,34 +46,34 @@ MISSIONS_1 = (
          "Home jumps to column A of the same row.", "ANCHOR", items=("S1.home",), wrong=("START HERE",),
          verify=("home", "H20")),
 )
-STAGE_1 = Stage("S1-1", "Warp Zones", "cross huge tables in one keystroke", ITEMS_1, MISSIONS_1, ARENA_1)
+STAGE_1 = Stage("S1-1", "Jump to Edges", ITEMS_1, MISSIONS_1, ARENA_1)
 
-# ------------------------------------------------------------------------------------ S1-2 Teleport
+# ------------------------------------------------------------------------------------ S1-2 Go To and Sheet Tabs
 ITEMS_2 = (
     Item("S1.goto", "shortcut", "F5 / Ctrl+G", "Open Go To: type an address or a name and jump there.",
          "Type a range like B2:D9 to jump there and select it.", "Which key opens the Go To box?",
          ("F5", "Ctrl+G"), "A function key, or Ctrl plus G."),
     Item("S1.ctrl_pgdn", "shortcut", "Ctrl+PgDn", "Move to the next sheet tab.",
-         "Hold Ctrl and keep tapping PgDn to flip through every tab.", "Which keys move to the next sheet?",
+         "Hold Ctrl and press PgDn repeatedly to step through every tab.", "Which keys move to the next sheet?",
          ("Ctrl+PgDn",), "Ctrl plus Page Down."),
     Item("S1.ctrl_pgup", "shortcut", "Ctrl+PgUp", "Move to the previous sheet tab.",
-         "Pairs with Ctrl+PgDn: Up goes left.", "Which keys move to the previous sheet?", ("Ctrl+PgUp",),
+         "Ctrl+PgDn moves right through the tabs, Ctrl+PgUp moves left.", "Which keys move to the previous sheet?", ("Ctrl+PgUp",),
          "Ctrl plus Page Up."),
     Item("S1.pgdn", "shortcut", "PgDn / PgUp", "Scroll one screen down / up.",
-         "Faster than holding ↓ when you just want to browse.", "Which key scrolls one screen down?", ("PgDn",),
+         "Faster than holding ↓ when you scan a long list.", "Which key scrolls one screen down?", ("PgDn",),
          "Page Down."),
     Item("S1.alt_pgdn", "shortcut", "Alt+PgDn / Alt+PgUp", "Scroll one screen right / left.",
-         "Wide sheet? Alt+PgDn pages sideways.", "Which keys scroll one screen to the right?", ("Alt+PgDn",),
+         "Use it to page across a wide sheet.", "Which keys scroll one screen to the right?", ("Alt+PgDn",),
          "Alt plus Page Down."),
 )
 ARENA_2 = Arena(
-    cells={"B5": "Teleport targets are hidden on this sheet. Use Go To (F5 or Ctrl+G).",
+    cells={"B5": "The target cells are far from here. Use Go To (F5 or Ctrl+G).",
            "K777": "VORTEX", "M40": "GALAXY"},
     pass_code="ZEPHYR", labels=("B5",), names={"TREASURE": "M40"},
 )
 MISSIONS_2 = (
     find("S1-2.M1", "Go to the arena sheet, press F5 (or Ctrl+G), type K777 in the Reference box and press Enter. "
-                    "Type the word you land on.", "Go To jumps on the sheet you're on: open the arena first.",
+                    "Type the word you land on.", "Go To works on the active sheet, so open the arena first.",
          "VORTEX", items=("S1.goto",), wrong=("GALAXY",), verify=("value_at", "K777")),
     find("S1-2.M2", "Press F5 and double-click TREASURE in the Go To list (names work from any sheet). "
                     "Type the word you land on.", "Defined names are listed at the top of the Go To box.",
@@ -86,9 +85,9 @@ MISSIONS_2 = (
                     "land on.", "Ctrl+PgUp = the previous tab to the left.", "QUASAR", items=("S1.ctrl_pgup",),
          wrong=("ZEPHYR",), verify=("pass_code", -1)),
 )
-STAGE_2 = Stage("S1-2", "Teleport", "jump to any cell or sheet instantly", ITEMS_2, MISSIONS_2, ARENA_2)
+STAGE_2 = Stage("S1-2", "Go To and Sheet Tabs", ITEMS_2, MISSIONS_2, ARENA_2)
 
-# ------------------------------------------------------------------------------------ S1-3 Lasso
+# ------------------------------------------------------------------------------------ S1-3 Extend Selection
 POINTS = [(i * 7) % 23 + 1 for i in range(1, 201)]
 SHIPS = [["Comet", 4, 120], ["Nova", 6, 95], ["Vega", 3, 140], ["Orion", 8, 210], ["Lyra", 2, 60],
          ["Draco", 5, 175], ["Hydra", 7, 130], ["Cygnus", 4, 88], ["Pyxis", 1, 45], ["Ara", 6, 160]]
@@ -100,12 +99,12 @@ ITEMS_3 = (
          "Select a whole column of data in one move: Ctrl+Shift+↓.",
          "Which keys extend the selection all the way to the edge of the data?",
          ("Ctrl+Shift+Arrow", "Ctrl+Shift+Down", "Ctrl+Shift+Up", "Ctrl+Shift+Left", "Ctrl+Shift+Right"),
-         "The warp-zone keys plus Shift."),
+         "Ctrl+Arrow plus Shift."),
     Item("S1.ctrl_shift_end", "shortcut", "Ctrl+Shift+End", "Extend the selection to the last used cell.",
-         "Grabs everything from here to the end of the data.",
+         "Selects from the active cell to the end of the used range.",
          "Which keys extend the selection to the last used cell?", ("Ctrl+Shift+End",), "Ctrl+End plus Shift."),
     Item("S1.ctrl_shift_home", "shortcut", "Ctrl+Shift+Home", "Extend the selection back to cell A1.",
-         "Selects everything above and to the left of you.", "Which keys extend the selection back to cell A1?",
+         "From the bottom-right cell of a table at the top of a sheet, it selects the whole table.", "Which keys extend the selection back to cell A1?",
          ("Ctrl+Shift+Home",), "Ctrl+Home plus Shift."),
 )
 ARENA_3 = Arena(
@@ -132,9 +131,9 @@ MISSIONS_3 = (
          "The selection now runs from A1 to H12.", COUNT_TO_A1, items=("S1.ctrl_shift_home",),
          wrong=(COUNT_TO_A1 - 1,), verify=("counta", "A1:H12")),
 )
-STAGE_3 = Stage("S1-3", "Lasso", "select big blocks in one move", ITEMS_3, MISSIONS_3, ARENA_3)
+STAGE_3 = Stage("S1-3", "Extend Selection", ITEMS_3, MISSIONS_3, ARENA_3)
 
-# ------------------------------------------------------------------------------------ S1-4 Grab
+# ------------------------------------------------------------------------------------ S1-4 Rows, Columns and Blocks
 GEMS = [(i * 13) % 37 + 5 for i in range(1, 21)]
 PLANETS = [["Mercury", 0, "No", 4223], ["Venus", 0, "No", 2802], ["Earth", 1, "No", 24], ["Mars", 2, "No", 25],
            ["Jupiter", 95, "Yes", 10], ["Saturn", 146, "Yes", 11], ["Uranus", 28, "Yes", 17],
@@ -142,15 +141,15 @@ PLANETS = [["Mercury", 0, "No", 4223], ["Venus", 0, "No", 2802], ["Earth", 1, "N
            ["Eris", 1, "No", 26]]
 ITEMS_4 = (
     Item("S1.shift_space", "shortcut", "Shift+Space", "Select the entire row.",
-         "Memory hook: Shift+Space = row, Ctrl+Space = column.", "Which keys select the entire row?",
+         "Shift+Space selects the row, Ctrl+Space the column.", "Which keys select the entire row?",
          ("Shift+Space",), "The long key plus Shift."),
     Item("S1.ctrl_space", "shortcut", "Ctrl+Space", "Select the entire column.",
-         "Next world: Ctrl+0 hides the column you selected.", "Which keys select the entire column?",
+         "Select the column first, then format, hide or delete it in one step.", "Which keys select the entire column?",
          ("Ctrl+Space",), "The long key plus Ctrl."),
     Item("S1.ctrl_a", "shortcut", "Ctrl+A", "Select the current data block; keep pressing to select the whole sheet.",
          "Ctrl+Shift+* also selects the current data block.",
          "Which keys select the current data block (and the whole sheet if you keep pressing)?",
-         ("Ctrl+A", "Ctrl+Shift+Space"), "Think 'A' for All."),
+         ("Ctrl+A", "Ctrl+Shift+Space"), "A for All."),
 )
 ARENA_4 = Arena(
     cells=merge(
@@ -170,11 +169,11 @@ MISSIONS_4 = (
                     "Type the status-bar Count.", "Shift+Space = row.", ROW_30, items=("S1.shift_space",),
          wrong=(ROW_30 + 1,), verify=("row_counta", 30)),
     find("S1-4.M3", "In the arena, click any cell inside the PLANETS table (it starts at B40) and press Ctrl+A once. "
-                    "Excel selects just that block. Type the status-bar Count.", "One press of Ctrl+A in data = the "
+                    "Excel selects only that block. Type the status-bar Count.", "One press of Ctrl+A in data = the "
                     "current block.", PLANET_CELLS, items=("S1.ctrl_a",), wrong=(PLANET_CELLS + 1,),
          verify=("counta_region", "C45")),
 )
-STAGE_4 = Stage("S1-4", "Grab", "grab whole rows, columns and blocks", ITEMS_4, MISSIONS_4, ARENA_4)
+STAGE_4 = Stage("S1-4", "Rows, Columns and Blocks", ITEMS_4, MISSIONS_4, ARENA_4)
 
 # ------------------------------------------------------------------------------------ Boss
 ENERGY = [(i * 11) % 29 + 3 for i in range(1, 101)]
@@ -208,7 +207,7 @@ BOSS_MISSIONS = (
          "Keep pressing until you hit a word.", "ECLIPSE", items=("S1.ctrl_arrow",), wrong=("ISLANDS",),
          verify=("end_chain", "D6", "down", 4)),
     find("S1-B.M3", "Press F5, go to J1200, then press Ctrl+→. Type the word you land on.",
-         "Teleport first, then warp sideways.", "AURORA", items=("S1.goto", "S1.ctrl_arrow"), wrong=("TITAN",),
+         "Go To first, then Ctrl+→.", "AURORA", items=("S1.goto", "S1.ctrl_arrow"), wrong=("TITAN",),
          verify=("end", "J1200", "right")),
     find("S1-B.M4", "Press Ctrl+End. Type the word in the last used cell.", "Lowest row, rightmost column.",
          "ZENITH", items=("S1.ctrl_end",), wrong=("AURORA",), verify=("lastcell",)),
@@ -232,7 +231,7 @@ BOSS_MISSIONS = (
 
 WORLD = World(
     code="S1", track="S", order=1, title="Navigate & Select",
-    tagline="Move and select anywhere on a sheet without touching the mouse.",
+    tagline="Move around a sheet and select cells without the mouse.",
     file_name="01 Shortcuts 1 - Navigate and Select.xlsx",
     stages=(STAGE_1, STAGE_2, STAGE_3, STAGE_4),
     boss=Boss(BOSS_MISSIONS, BOSS_ARENA, par_minutes=10),
