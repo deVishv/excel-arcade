@@ -35,16 +35,16 @@ Learn Excel keyboard shortcuts and essential formulas by playing. 13 self checki
 | `09 Formulas 5 - Text` | LEFT/RIGHT/MID, TRIM, PROPER, FIND/SEARCH, TEXTJOIN, TEXT, VALUE |
 | `10 Formulas 6 - Dates` | TODAY, DATE, EDATE, EOMONTH, DATEDIF, NETWORKDAYS, WORKDAY |
 | `11 Formulas 7 - Dynamic Arrays` | Spills, SEQUENCE, FILTER, SORT/SORTBY, UNIQUE, LET |
-| `12 Final Boss - Championship` | Three rounds mixing the whole course, plus a certificate |
+| `12 Final Boss` | Three rounds mixing the whole course, plus a certificate |
 
 ## How to play
-Each world has a **Start** hub, 3–5 **stages**, a **Boss** and a **Cheat Codes** sheet.
+Each world has a **Start** hub, 3–5 **stages**, a **Boss** and a **Reference** sheet.
 - **Stages:** read the *Briefing*, answer the *Warm-up* (reviews of earlier moves), the *Training* (pick from a list) and the *Challenges* (type the answer, then do it for real in the stage's **Arena** sheet).
 - **Yellow cells are yours.** Type an answer, pick from a list with **Alt+↓**, or follow a **> ARENA** link.
-- **Feedback:** `✔ CLEAR` right · `✘ TRY AGAIN` wrong · `· not yet` drill not done. For formatting and hiding drills, press **F9** to refresh the check.
+- **Feedback:** `✔ Correct` right, `✘ Try again` wrong, `○ Not yet` task not done. For formatting and hiding drills, press **F9** to refresh the check.
 - **Scoring:** 10 XP per question, or 5 XP if you pick *Show hint*. Stars: ★☆☆ at 50%, ★★☆ at 80%, ★★★ at 100%.
 - **Boss:** unlocks when every stage has at least one star. Stamp START and FINISH with **Ctrl+Shift+:** to race the par time.
-- **Rank:** S (100% and under par) · A ≥ 90% · B ≥ 75% · C ≥ 50% · D.
+- **Rank:** S (100% and under par), A ≥ 90%, B ≥ 75%, C ≥ 50%, otherwise D.
 - **Replay a stage:** select a run of its yellow cells (Ctrl+click to add more), then press **Delete**.
 
 ## Spaced repetition
